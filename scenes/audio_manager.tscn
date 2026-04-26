@@ -1,0 +1,26 @@
+[gd_scene format=3 uid="uid://5osb6bdvsge1"]
+
+[ext_resource type="Script" uid="uid://ddj8ru3lulerr" path="res://scenes/audio_manager.gd" id="1_njtn3"]
+[ext_resource type="AudioStream" uid="uid://2vbay644lqdm" path="res://audio/hit.mp3" id="2_kq7b2"]
+[ext_resource type="AudioStream" uid="uid://bp3bqhfxhhkw3" path="res://audio/miss.mp3" id="2_njtn3"]
+[ext_resource type="AudioStream" uid="uid://bgjckiykfbxqj" path="res://audio/victory.mp3" id="4_02gw7"]
+[ext_resource type="AudioStream" uid="uid://dxv7emgicc82y" path="res://audio/destuction.mp3" id="4_ujhup"]
+[ext_resource type="AudioStream" uid="uid://re6qjjjs6yl" path="res://audio/defeat.mp3" id="5_ujhup"]
+
+[node name="AudioManager" type="Node" unique_id=684749532]
+script = ExtResource("1_njtn3")
+
+[node name="HitPlayer" type="AudioStreamPlayer" parent="." unique_id=1528721601]
+stream = ExtResource("2_kq7b2")
+
+[node name="MissPlayer" type="AudioStreamPlayer" parent="." unique_id=405127478]
+stream = ExtResource("2_njtn3")
+
+[node name="SunkPlayer" type="AudioStreamPlayer" parent="." unique_id=1354297587]
+stream = ExtResource("4_ujhup")
+
+[node name="VictoryPlayer" type="AudioStreamPlayer" parent="." unique_id=1503119260]
+stream = ExtResource("4_02gw7")
+
+[node name="DefeatPlayer" type="AudioStreamPlayer" parent="." unique_id=1105418997]
+stream = ExtResource("5_ujhup")
