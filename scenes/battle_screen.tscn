@@ -53,6 +53,16 @@ offset_bottom = 52.0
 text = "⬅ MENU"
 theme_override_font_sizes/font_size = 13
 
+[node name="TimerLabel" type="Label" parent="UILayer/HUD"]
+offset_left = 124.0
+offset_right = 260.0
+offset_top = 8.0
+offset_bottom = 58.0
+text = "00:00"
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
+
 [node name="TurnLabel" type="Label" parent="UILayer/HUD"]
 anchor_left = 0.5
 anchor_right = 0.5
