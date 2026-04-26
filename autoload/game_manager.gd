@@ -2,6 +2,7 @@ extends Node
 
 enum State { PLACEMENT, PLAYER_TURN, AI_TURN, RESULT_PAUSE, HANDOFF, GAME_OVER }
 enum GameMode { VS_AI, LOCAL_PVP, AI_VS_AI, CAMPAIGN }
+enum AIDifficulty { EASY, MEDIUM, HARD, IMPOSSIBLE }
 
 signal turn_changed(new_state: State)
 signal shot_fired(cell: Vector2i, result: Dictionary)
@@ -131,6 +132,7 @@ const CAMPAIGN_LEVELS := [
 ]
 
 var mode: GameMode = GameMode.VS_AI
+var ai_difficulty: int = AIDifficulty.MEDIUM
 var state: State = State.PLACEMENT
 var player_board: BoardState
 var ai_board: BoardState
@@ -254,6 +256,11 @@ func advance_campaign_level() -> void:
 	if not campaign_is_final_level():
 		campaign_level_index += 1
 
+func start_vs_ai_game(difficulty: int) -> void:
+	mode = GameMode.VS_AI
+	reset()
+	ai_difficulty = difficulty
+
 # ── Placement phase ──────────────────────────────────────────────────────────
 
 func placement_board(player_number: int) -> BoardState:
@@ -280,6 +287,19 @@ func start_battle(ai_node = null, ai_player_2_node = null) -> void:
 		_timer.wait_time = level["ai_delay"]
 		_fox_decoys_remaining = 2 if campaign_ability() in ["decoy", "true_mix"] else 0
 		_bear_area_cooldown = 0
+	if mode == GameMode.VS_AI and _ai != null:
+		_ai.set_difficulty(ai_difficulty)
+		_ai.set_target_board(player_board)
+	elif mode == GameMode.CAMPAIGN and _ai != null:
+		_ai.set_difficulty(AIDifficulty.HARD)
+		_ai.set_target_board(player_board)
+	elif mode == GameMode.AI_VS_AI:
+		if _ai_player_1 != null:
+			_ai_player_1.set_difficulty(AIDifficulty.HARD)
+			_ai_player_1.set_target_board(ai_board)
+		if _ai_player_2 != null:
+			_ai_player_2.set_difficulty(AIDifficulty.HARD)
+			_ai_player_2.set_target_board(player_board)
 	active_player = 1
 	state = State.AI_TURN if mode == GameMode.AI_VS_AI else State.PLAYER_TURN
 	turn_changed.emit(state)
@@ -496,6 +516,7 @@ func _run_ai_vs_ai_turn() -> void:
 		return
 	var controller = _ai_player_1 if active_player == 1 else _ai_player_2
 	var target_board := current_target_board()
+	controller.set_target_board(target_board)
 	var cell: Vector2i = controller.choose_cell()
 	var result := target_board.fire(cell)
 	controller.on_fire_result(cell, result)

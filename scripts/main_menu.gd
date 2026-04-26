@@ -31,8 +31,7 @@ func _ready() -> void:
 	_name_edit.text_submitted.connect(_on_name_submitted)
 
 func _on_vs_ai() -> void:
-	GameManager.start_new_game(GameManager.GameMode.VS_AI)
-	get_tree().call_deferred("change_scene_to_file", "res://scenes/placement_screen.tscn")
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/difficulty_menu.tscn")
 
 func _on_campaign() -> void:
 	if GameManager.has_campaign_progress():
