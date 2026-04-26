@@ -94,7 +94,7 @@ mouse_filter = 0
 [node name="Scrim" type="ColorRect" parent="UILayer/DialogueOverlay"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-color = Color(0.03, 0.06, 0.11, 0.92)
+color = Color(0.03, 0.06, 0.11, 0.68)
 
 [node name="Panel" type="PanelContainer" parent="UILayer/DialogueOverlay"]
 anchor_left = 0.5
@@ -105,6 +105,7 @@ offset_left = -430.0
 offset_right = 430.0
 offset_top = -170.0
 offset_bottom = 170.0
+modulate = Color(0.93, 0.97, 1, 0.96)
 
 [node name="VBox" type="VBoxContainer" parent="UILayer/DialogueOverlay/Panel"]
 custom_minimum_size = Vector2(860, 340)

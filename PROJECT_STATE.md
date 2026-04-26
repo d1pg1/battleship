@@ -99,7 +99,7 @@ placement_screen.tscn
 
 Campaign levels use the standard 10×10 fleet and existing battle rules. Grandparents and Hare use simple random-fire AI profiles with different pacing; Wolf and later campaign opponents use hunt/target AI, with special abilities layered on top for Bear, Kolobok, Fox, and True Kolobok.
 
-Campaign placement now begins with a click-through dialogue overlay using character portraits from `assets/Naval Battle Assets/Characters`, before the player can place ships. Player response lines use the commander-name initials placeholder until a player portrait exists. Level 1 also includes tutorial copy during placement and opening dialogue that explains placement spacing, firing, hits, misses, and turn changes.
+Campaign placement now begins with a click-through dialogue overlay on top of the naval background image, using character portraits from `assets/Naval Battle Assets/Characters`, before the player can place ships. Player response lines use the commander-name initials placeholder until a player portrait exists. Level 1 also includes tutorial copy during placement and opening dialogue that explains placement spacing, firing, hits, misses, and turn changes.
 
 Starting a campaign asks for a commander name, which is inserted into player dialogue lines. If the player returns to the main menu during a campaign, the current level is kept in memory for the current app session only; clicking Campaign again offers Continue or Start New. No campaign progress is written to disk.
 
