@@ -3,11 +3,20 @@ extends Node
 
 enum AIState { HUNT, TARGET }
 
+var difficulty: int = GameManager.AIDifficulty.MEDIUM
+var target_board: BoardState = null
+
 var _mode: AIState = AIState.HUNT
 var _fired: Array[Vector2i] = []
 var _hit_queue: Array[Vector2i] = []
 var _hit_run: Array[Vector2i] = []
 var _locked_axis: int = -1  # -1=none, 0=horizontal, 1=vertical
+
+func set_difficulty(new_difficulty: int) -> void:
+	difficulty = new_difficulty
+
+func set_target_board(board: BoardState) -> void:
+	target_board = board
 
 func add_to_fired(cells: Array[Vector2i]) -> void:
 	for cell in cells:
@@ -22,15 +31,22 @@ func reset() -> void:
 	_locked_axis = -1
 
 func choose_cell() -> Vector2i:
-	var cell: Vector2i
-	if _mode == AIState.HUNT:
-		cell = _hunt()
-	else:
-		cell = _target()
+	var cell := _choose_for_difficulty()
 	_fired.append(cell)
 	return cell
 
 func on_fire_result(cell: Vector2i, result: Dictionary) -> void:
+	if difficulty == GameManager.AIDifficulty.EASY:
+		return
+
+	if difficulty == GameManager.AIDifficulty.MEDIUM:
+		if result["result"] == BoardState.Cell.HIT:
+			_mode = AIState.TARGET
+			_enqueue_orthogonal(cell)
+		if result["sunk_ship"] != null:
+			_reset_target()
+		return
+
 	if result["result"] == BoardState.Cell.HIT:
 		_hit_run.append(cell)
 
@@ -51,6 +67,44 @@ func on_fire_result(cell: Vector2i, result: Dictionary) -> void:
 	if result["sunk_ship"] != null:
 		_reset_target()
 
+func _choose_for_difficulty() -> Vector2i:
+	match difficulty:
+		GameManager.AIDifficulty.EASY:
+			return _random_unfired()
+		GameManager.AIDifficulty.MEDIUM:
+			return _medium_choice()
+		GameManager.AIDifficulty.IMPOSSIBLE:
+			return _impossible_choice()
+		_:
+			return _hard_choice()
+
+func _medium_choice() -> Vector2i:
+	if _mode == AIState.TARGET:
+		while not _hit_queue.is_empty():
+			var candidate: Vector2i = _hit_queue.pop_front()
+			if _is_valid(candidate):
+				return candidate
+		_reset_target()
+	return _hunt()
+
+func _hard_choice() -> Vector2i:
+	if _mode == AIState.HUNT:
+		return _hunt()
+	return _target()
+
+func _impossible_choice() -> Vector2i:
+	if target_board != null:
+		var ship_cells: Array[Vector2i] = []
+		for row in range(BoardState.GRID_SIZE):
+			for col in range(BoardState.GRID_SIZE):
+				var cell := Vector2i(col, row)
+				if target_board.get_cell(cell) == BoardState.Cell.SHIP and not (cell in _fired):
+					ship_cells.append(cell)
+		if not ship_cells.is_empty():
+			ship_cells.shuffle()
+			return ship_cells[0]
+	return _hard_choice()
+
 func _hunt() -> Vector2i:
 	var candidates: Array[Vector2i] = []
 	for row in range(10):
@@ -67,6 +121,16 @@ func _hunt() -> Vector2i:
 				if not (cell in _fired):
 					candidates.append(cell)
 
+	candidates.shuffle()
+	return candidates[0]
+
+func _random_unfired() -> Vector2i:
+	var candidates: Array[Vector2i] = []
+	for row in range(10):
+		for col in range(10):
+			var cell := Vector2i(col, row)
+			if not (cell in _fired):
+				candidates.append(cell)
 	candidates.shuffle()
 	return candidates[0]
 
