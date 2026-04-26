@@ -4,11 +4,15 @@ extends Control
 @onready var _turn_label: Label    = $TurnLabel
 @onready var _feedback_label: Label = $FeedbackLabel
 @onready var _sunk_label: Label    = $SunkLabel
+@onready var _timer_label: Label   = $TimerLabel
 
 var _feedback_timer: Timer
 var _sunk_timer: Timer
+var _elapsed_seconds := 0.0
 
 func _ready() -> void:
+	set_process(false)
+
 	_feedback_timer = Timer.new()
 	_feedback_timer.one_shot = true
 	_feedback_timer.wait_time = 1.5
@@ -29,6 +33,11 @@ func _ready() -> void:
 	_turn_label.text = "YOUR TURN"
 	_feedback_label.text = ""
 	_sunk_label.text = ""
+	_update_timer_label()
+
+func _process(delta: float) -> void:
+	_elapsed_seconds += delta
+	_update_timer_label()
 
 func _on_turn_changed(new_state: GameManager.State) -> void:
 	match new_state:
@@ -43,6 +52,7 @@ func _on_turn_changed(new_state: GameManager.State) -> void:
 			_turn_label.text = ""
 		GameManager.State.GAME_OVER:
 			_turn_label.text = ""
+	set_process(new_state != GameManager.State.GAME_OVER)
 
 func _on_shot_fired(_cell: Vector2i, result: Dictionary) -> void:
 	if result["result"] == BoardState.Cell.HIT:
@@ -58,5 +68,16 @@ func _on_ship_sunk(data: ShipData, _owner: String) -> void:
 	_sunk_timer.start()
 
 func _on_game_ended(_winner: String) -> void:
+	set_process(false)
 	_turn_label.text = ""
 	_feedback_label.text = ""
+
+func _update_timer_label() -> void:
+	var total_seconds := int(_elapsed_seconds)
+	var seconds := total_seconds % 60
+	var minutes := floori(total_seconds / 60.0) % 60
+	var hours := floori(total_seconds / 3600.0)
+	if hours > 0:
+		_timer_label.text = "%02d:%02d:%02d" % [hours, minutes, seconds]
+	else:
+		_timer_label.text = "%02d:%02d" % [minutes, seconds]
