@@ -33,9 +33,14 @@ func _ready() -> void:
 func _on_turn_changed(new_state: GameManager.State) -> void:
 	match new_state:
 		GameManager.State.PLAYER_TURN:
-			_turn_label.text = "YOUR TURN"
+			if GameManager.mode == GameManager.GameMode.LOCAL_PVP:
+				_turn_label.text = GameManager.active_player_label() + " TURN"
+			else:
+				_turn_label.text = "YOUR TURN"
 		GameManager.State.AI_TURN:
 			_turn_label.text = "ENEMY FIRING..."
+		GameManager.State.HANDOFF:
+			_turn_label.text = ""
 		GameManager.State.GAME_OVER:
 			_turn_label.text = ""
 

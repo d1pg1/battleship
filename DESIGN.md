@@ -100,7 +100,8 @@ Two 10×10 grids (columns A–J, rows 1–10).
 
 ### Combat Rules
 
-- Player and AI alternate single shots per turn
+- A hit keeps the turn with the current shooter
+- A miss passes turn control to the opponent
 - A cell already fired at cannot be selected again (visually blocked)
 - A HIT is any shot landing on an occupied cell of an opposing ship
 - A ship is SUNK when all of its cells have been hit
@@ -205,7 +206,7 @@ Naval Strike targets **zero onboarding text**. The player learns entirely throug
 
 ### AI Turn Pacing
 
-After the player fires, a **0.8-second delay** is inserted before the AI shot resolves. This prevents the game feeling reactive and gives the player time to process their own shot result.
+After the player misses, a **0.8-second delay** is inserted before the AI shot resolves. When the AI hits, each follow-up AI shot is also delayed by 0.8 seconds so the player can read the board state.
 
 ### Emotional Arc
 
@@ -319,10 +320,10 @@ All requirements below are pass/fail verifiable with no design interpretation ne
 | CB-04 | A cell with a hit or miss marker cannot be targeted again in the same game.                                         |
 | CB-05 | When all cells of an enemy ship have been hit, the game displays a sunk notification naming that ship.              |
 | CB-06 | When a ship is sunk, its full shape becomes visible on the enemy grid.                                              |
-| CB-07 | After the player fires, at least 0.5 seconds pass before the AI fires.                                             |
+| CB-07 | After the player misses, at least 0.5 seconds pass before the AI fires.                                            |
 | CB-08 | The AI never fires at a cell it has previously fired at.                                                            |
 | CB-09 | After an AI hit, the AI fires at an orthogonal neighbor of the hit cell on its next eligible turn.                  |
-| CB-10 | AI and Player shots strictly alternate — no double turns.                                                           |
+| CB-10 | A hit keeps the turn with the current shooter; a miss passes control to the opponent.                                |
 
 ### REQ-END — Win / Loss / Restart
 

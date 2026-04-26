@@ -102,3 +102,42 @@ text = "YOUR FLEET"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 13
 modulate = Color(0.65, 0.72, 0.85, 1)
+
+[node name="HandoffOverlay" type="Control" parent="UILayer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 0
+
+[node name="Scrim" type="ColorRect" parent="UILayer/HandoffOverlay"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.06, 0.11, 0.96)
+
+[node name="Panel" type="PanelContainer" parent="UILayer/HandoffOverlay"]
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_right = 190.0
+offset_top = -90.0
+offset_bottom = 90.0
+
+[node name="VBox" type="VBoxContainer" parent="UILayer/HandoffOverlay/Panel"]
+custom_minimum_size = Vector2(380, 180)
+alignment = 1
+
+[node name="HandoffLabel" type="Label" parent="UILayer/HandoffOverlay/Panel/VBox"]
+text = "PASS TO PLAYER 1"
+horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+
+[node name="Spacer" type="Control" parent="UILayer/HandoffOverlay/Panel/VBox"]
+custom_minimum_size = Vector2(0, 22)
+
+[node name="ReadyButton" type="Button" parent="UILayer/HandoffOverlay/Panel/VBox"]
+text = "READY"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22

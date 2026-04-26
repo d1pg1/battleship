@@ -7,6 +7,7 @@ signal cell_tapped(cell: Vector2i)
 @export var hide_ships: bool = false
 # Whether this display is the enemy grid (gates sunk reveal and turn-based interactivity)
 @export var is_enemy_grid: bool = false
+@export var placement_player_number: int = 1
 
 const GRID_SIZE := 10
 const CELL_SIZE := 56.0
@@ -91,7 +92,7 @@ func _draw() -> void:
 
 	# ── Ghost ship preview ───────────────────────────────────────────────────
 	if _ghost_ship != null:
-		var is_valid := GameManager.can_place(_ghost_ship)
+		var is_valid := GameManager.can_place(_ghost_ship, placement_player_number)
 		var ghost_col := COL_GHOST_OK if is_valid else COL_GHOST_BAD
 		for cell in _ghost_ship.cells():
 			if _in_bounds(cell):
@@ -134,6 +135,15 @@ func _input(event: InputEvent) -> void:
 func refresh() -> void:
 	queue_redraw()
 
+func set_board_state(new_board_state: BoardState) -> void:
+	board_state = new_board_state
+	_revealed_ships = []
+	if board_state != null and hide_ships:
+		for ship in board_state.ships:
+			if ship.is_sunk():
+				_revealed_ships.append(ship)
+	queue_redraw()
+
 func set_ghost(data: ShipData) -> void:
 	_ghost_ship = data
 	queue_redraw()
@@ -146,8 +156,8 @@ func _on_turn_changed(new_state: GameManager.State) -> void:
 		set_process(interactive)
 	queue_redraw()
 
-func _on_ship_sunk(data: ShipData, owner: String) -> void:
-	if is_enemy_grid and owner == "ai":
+func _on_ship_sunk(data: ShipData, _owner: String) -> void:
+	if is_enemy_grid and board_state != null and data in board_state.ships:
 		_revealed_ships.append(data)
 	queue_redraw()
 

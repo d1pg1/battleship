@@ -11,6 +11,10 @@ func _ready() -> void:
 	_setup(GameManager.last_winner)
 
 func _setup(winner: String) -> void:
+	if GameManager.mode == GameManager.GameMode.LOCAL_PVP:
+		_result_label.text = "PLAYER 1 WINS" if winner == "player1" else "PLAYER 2 WINS"
+		_result_label.modulate = Color(0.3, 1.0, 0.4)
+		return
 	if winner == "player":
 		_result_label.text = "VICTORY"
 		_result_label.modulate = Color(0.3, 1.0, 0.4)

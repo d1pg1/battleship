@@ -16,6 +16,7 @@ const FLEET := [
 
 @onready var _player_grid: GridDisplay = $"../PlayerGridDisplay"
 @onready var _ship_list: VBoxContainer = $"../Sidebar/VLayout/ShipList"
+@onready var _title_label: Label       = $"../Sidebar/VLayout/TitleLabel"
 @onready var _rotate_btn: Button       = $"../Sidebar/VLayout/RotateButton"
 @onready var _random_btn: Button       = $"../Sidebar/VLayout/RandomButton"
 @onready var _start_btn: Button        = $"../Sidebar/VLayout/StartButton"
@@ -24,15 +25,43 @@ var _fleet_data: Array[ShipData] = []
 var _ship_buttons: Array[Button] = []
 var _selected: ShipData = null
 var _horizontal: bool = true
+var _placing_player: int = 1
 
 func _ready() -> void:
 	GameManager.reset()
-	_player_grid.board_state = GameManager.player_board
 	_player_grid.interactive = true
 	_player_grid.hide_ships = false
 	_player_grid.is_enemy_grid = false
 
-	# Build fleet data and sidebar buttons
+	_begin_placement_for_player(1)
+
+	_rotate_btn.pressed.connect(_on_rotate_pressed)
+	_random_btn.pressed.connect(_on_random_pressed)
+	_start_btn.pressed.connect(_on_start_pressed)
+	_player_grid.cell_tapped.connect(_on_grid_cell_tapped)
+
+func _begin_placement_for_player(player_number: int) -> void:
+	_placing_player = player_number
+	_selected = null
+	_horizontal = true
+	_fleet_data = []
+	_ship_buttons = []
+	for child in _ship_list.get_children():
+		_ship_list.remove_child(child)
+		child.queue_free()
+
+	if GameManager.mode == GameManager.GameMode.LOCAL_PVP:
+		_title_label.text = "PLAYER %d: PLACE FLEET" % _placing_player
+	else:
+		_title_label.text = "PLACE YOUR FLEET"
+	if _placing_player == 2 or GameManager.mode == GameManager.GameMode.VS_AI:
+		_start_btn.text = "START BATTLE"
+	else:
+		_start_btn.text = "NEXT PLAYER"
+	_player_grid.placement_player_number = _placing_player
+	_player_grid.set_ghost(null)
+	_player_grid.set_board_state(GameManager.placement_board(_placing_player))
+
 	for def in FLEET:
 		var data := ShipData.new()
 		data.ship_name = def["name"]
@@ -49,17 +78,12 @@ func _ready() -> void:
 		_ship_list.add_child(btn)
 		_ship_buttons.append(btn)
 
-	_rotate_btn.pressed.connect(_on_rotate_pressed)
-	_random_btn.pressed.connect(_on_random_pressed)
-	_start_btn.pressed.connect(_on_start_pressed)
-	_player_grid.cell_tapped.connect(_on_grid_cell_tapped)
-
 	_update_start_button()
 
 func _on_ship_button_pressed(data: ShipData) -> void:
 	# If already placed, unplace it first
 	if data.is_placed:
-		GameManager.remove_ship(data)
+		GameManager.remove_ship(data, _placing_player)
 		_player_grid.refresh()
 		_update_button_style(data, false)
 
@@ -78,7 +102,7 @@ func _on_grid_cell_tapped(cell: Vector2i) -> void:
 		return
 	_selected.origin = cell
 	_selected.horizontal = _horizontal
-	if GameManager.place_ship(_selected):
+	if GameManager.place_ship(_selected, _placing_player):
 		_update_button_style(_selected, true)
 		_player_grid.set_ghost(null)
 		_player_grid.refresh()
@@ -92,7 +116,7 @@ func _on_random_pressed() -> void:
 	# Remove all currently placed ships and reset their state
 	for data in _fleet_data:
 		if data.is_placed:
-			GameManager.remove_ship(data)
+			GameManager.remove_ship(data, _placing_player)
 		data.hit_count = 0
 		data.is_placed = false
 
@@ -109,7 +133,7 @@ func _on_random_pressed() -> void:
 			var max_x := BoardState.GRID_SIZE - (data.size if data.horizontal else 1)
 			var max_y := BoardState.GRID_SIZE - (1 if data.horizontal else data.size)
 			data.origin = Vector2i(randi() % (max_x + 1), randi() % (max_y + 1))
-			if GameManager.place_ship(data):
+			if GameManager.place_ship(data, _placing_player):
 				placed = true
 		if not placed:
 			push_error("PlacementController: could not randomly place " + data.ship_name)
@@ -122,6 +146,9 @@ func _on_random_pressed() -> void:
 
 func _on_start_pressed() -> void:
 	_player_grid.set_ghost(null)
+	if GameManager.mode == GameManager.GameMode.LOCAL_PVP and _placing_player == 1:
+		_begin_placement_for_player(2)
+		return
 	get_tree().call_deferred("change_scene_to_file", "res://scenes/battle_screen.tscn")
 
 func _update_ghost() -> void:
@@ -140,7 +167,7 @@ func _update_button_style(data: ShipData, placed: bool) -> void:
 
 func _update_start_button() -> void:
 	# Count ships actually placed on board
-	var placed_count := GameManager.player_board.ships.size()
+	var placed_count := GameManager.placement_board(_placing_player).ships.size()
 	_start_btn.disabled = (placed_count < FLEET.size())
 
 func _unhandled_key_input(event: InputEvent) -> void:

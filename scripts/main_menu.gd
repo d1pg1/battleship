@@ -1,14 +1,21 @@
 class_name MainMenu
 extends Control
 
-@onready var _play_btn: Button = $VBox/PlayButton
+@onready var _vs_ai_btn: Button = $VBox/VsAIButton
+@onready var _local_pvp_btn: Button = $VBox/LocalPvpButton
 @onready var _quit_btn: Button = $VBox/QuitButton
 
 func _ready() -> void:
-	_play_btn.pressed.connect(_on_play)
+	_vs_ai_btn.pressed.connect(_on_vs_ai)
+	_local_pvp_btn.pressed.connect(_on_local_pvp)
 	_quit_btn.pressed.connect(_on_quit)
 
-func _on_play() -> void:
+func _on_vs_ai() -> void:
+	GameManager.start_new_game(GameManager.GameMode.VS_AI)
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/placement_screen.tscn")
+
+func _on_local_pvp() -> void:
+	GameManager.start_new_game(GameManager.GameMode.LOCAL_PVP)
 	get_tree().call_deferred("change_scene_to_file", "res://scenes/placement_screen.tscn")
 
 func _on_quit() -> void:
