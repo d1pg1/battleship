@@ -79,6 +79,36 @@ battle_screen.tscn
 result_screen.tscn
 ```
 
+Campaign mode adds a playable Kolobok progression on top of the normal VS AI loop:
+
+```
+main_menu.tscn
+    │  [CAMPAIGN]
+    ▼
+placement_screen.tscn
+    │  place fleet → [START BATTLE]
+    ▼
+battle_screen.tscn
+    │  fight current Kolobok opponent
+    ▼
+result_screen.tscn
+    │  [NEXT LEVEL] / [RETRY LEVEL]
+    ▼
+placement_screen.tscn
+```
+
+Campaign levels use the standard 10×10 fleet and existing battle rules. Grandparents and Hare use simple random-fire AI profiles with different pacing; Wolf and later campaign opponents use hunt/target AI, with special abilities layered on top for Bear, Kolobok, Fox, and True Kolobok.
+
+Campaign placement now begins with a click-through dialogue overlay using placeholder character portraits, before the player can place ships. Level 1 also includes tutorial copy during placement and opening dialogue that explains placement spacing, firing, hits, misses, and turn changes.
+
+Starting a campaign asks for a commander name, which is inserted into player dialogue lines. If the player returns to the main menu during a campaign, the current level is kept in memory for the current app session only; clicking Campaign again offers Continue or Start New. No campaign progress is written to disk.
+
+Campaign abilities are active:
+- Hare and True Kolobok can force a timed player turn; if the player waits too long, the turn passes.
+- Bear and True Kolobok can launch a cross-shaped area strike on cooldown.
+- Kolobok and True Kolobok can relocate one unhit hidden ship after the player lands a hit.
+- Fox and True Kolobok can spend limited false signals that make a miss feel suspicious in the HUD while the board still records the real miss.
+
 All scene transitions use `get_tree().call_deferred("change_scene_to_file", path)` to avoid mid-signal crashes.
 
 ---

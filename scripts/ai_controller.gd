@@ -2,15 +2,27 @@ class_name AIController
 extends Node
 
 enum AIState { HUNT, TARGET }
+enum Profile { RANDOM, HARE, WOLF }
 
 var difficulty: int = GameManager.AIDifficulty.MEDIUM
 var target_board: BoardState = null
 
 var _mode: AIState = AIState.HUNT
+var _profile: Profile = Profile.WOLF
 var _fired: Array[Vector2i] = []
 var _hit_queue: Array[Vector2i] = []
 var _hit_run: Array[Vector2i] = []
 var _locked_axis: int = -1  # -1=none, 0=horizontal, 1=vertical
+
+func configure_profile(profile_name: String) -> void:
+	match profile_name:
+		"random":
+			_profile = Profile.RANDOM
+		"hare":
+			_profile = Profile.HARE
+		_:
+			_profile = Profile.WOLF
+	reset()
 
 func set_difficulty(new_difficulty: int) -> void:
 	difficulty = new_difficulty
@@ -31,11 +43,21 @@ func reset() -> void:
 	_locked_axis = -1
 
 func choose_cell() -> Vector2i:
-	var cell := _choose_for_difficulty()
+	var cell: Vector2i
+	match _profile:
+		Profile.RANDOM:
+			cell = _random_unfired()
+		Profile.HARE:
+			cell = _random_unfired()
+		_:
+			cell = _choose_for_difficulty()
 	_fired.append(cell)
 	return cell
 
 func on_fire_result(cell: Vector2i, result: Dictionary) -> void:
+	if _profile != Profile.WOLF:
+		return
+
 	if difficulty == GameManager.AIDifficulty.EASY:
 		return
 

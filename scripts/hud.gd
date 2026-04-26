@@ -28,11 +28,17 @@ func _ready() -> void:
 	GameManager.turn_changed.connect(_on_turn_changed)
 	GameManager.shot_fired.connect(_on_shot_fired)
 	GameManager.ship_sunk.connect(_on_ship_sunk)
+	GameManager.campaign_event.connect(_on_campaign_event)
 	GameManager.game_ended.connect(_on_game_ended)
 
-	_turn_label.text = "YOUR TURN"
+	if GameManager.mode == GameManager.GameMode.CAMPAIGN:
+		_turn_label.text = GameManager.campaign_title().to_upper()
+		_sunk_label.text = GameManager.campaign_intro()
+		_sunk_timer.wait_time = 5.0
+		_sunk_timer.start()
+	else:
+		_turn_label.text = "YOUR TURN"
 	_feedback_label.text = ""
-	_sunk_label.text = ""
 	_update_timer_label()
 
 func _process(delta: float) -> void:
@@ -44,6 +50,8 @@ func _on_turn_changed(new_state: GameManager.State) -> void:
 		GameManager.State.PLAYER_TURN:
 			if GameManager.mode == GameManager.GameMode.LOCAL_PVP:
 				_turn_label.text = GameManager.active_player_label() + " TURN"
+			elif GameManager.mode == GameManager.GameMode.CAMPAIGN:
+				_turn_label.text = "YOUR TURN - " + GameManager.campaign_opponent_name().to_upper()
 			else:
 				_turn_label.text = "YOUR TURN"
 		GameManager.State.AI_TURN:
@@ -58,7 +66,13 @@ func _on_turn_changed(new_state: GameManager.State) -> void:
 	set_process(new_state != GameManager.State.GAME_OVER)
 
 func _on_shot_fired(_cell: Vector2i, result: Dictionary) -> void:
-	if result["result"] == BoardState.Cell.HIT:
+	if result.has("decoy") and result["decoy"]:
+		_feedback_label.text = "SIGNAL?"
+		_feedback_label.modulate = Color(1.0, 0.86, 0.35)
+		_sunk_label.text = result["message"]
+		_sunk_timer.wait_time = 2.5
+		_sunk_timer.start()
+	elif result["result"] == BoardState.Cell.HIT:
 		_feedback_label.text = "HIT!"
 		_feedback_label.modulate = Color(1.0, 0.3, 0.2)
 	else:
@@ -68,6 +82,12 @@ func _on_shot_fired(_cell: Vector2i, result: Dictionary) -> void:
 
 func _on_ship_sunk(data: ShipData, _owner: String) -> void:
 	_sunk_label.text = "%s SUNK!" % data.ship_name.to_upper()
+	_sunk_timer.wait_time = 2.0
+	_sunk_timer.start()
+
+func _on_campaign_event(text: String) -> void:
+	_sunk_label.text = text
+	_sunk_timer.wait_time = 3.0
 	_sunk_timer.start()
 
 func _on_game_ended(_winner: String) -> void:
