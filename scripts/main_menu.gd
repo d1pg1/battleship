@@ -13,8 +13,7 @@ func _ready() -> void:
 	_quit_btn.pressed.connect(_on_quit)
 
 func _on_vs_ai() -> void:
-	GameManager.start_new_game(GameManager.GameMode.VS_AI)
-	get_tree().call_deferred("change_scene_to_file", "res://scenes/placement_screen.tscn")
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/difficulty_menu.tscn")
 
 func _on_local_pvp() -> void:
 	GameManager.start_new_game(GameManager.GameMode.LOCAL_PVP)
