@@ -1,0 +1,94 @@
+[gd_scene load_steps=5 format=3 uid="uid://battle_screen"]
+
+[ext_resource type="Script" path="res://scripts/battle_screen.gd" id="1_bs"]
+[ext_resource type="Script" path="res://scripts/ai_controller.gd" id="2_ai"]
+[ext_resource type="Script" path="res://scripts/grid_display.gd" id="3_grid"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="4_hud"]
+
+[node name="BattleScreen" type="Node2D"]
+script = ExtResource("1_bs")
+
+[node name="AIController" type="Node" parent="."]
+script = ExtResource("2_ai")
+
+[node name="Background" type="ColorRect" parent="."]
+position = Vector2(0, 0)
+size = Vector2(1280, 720)
+color = Color(0.05, 0.10, 0.20, 1.0)
+
+[node name="EnemyGridDisplay" type="Node2D" parent="."]
+position = Vector2(20, 70)
+script = ExtResource("3_grid")
+interactive = true
+hide_ships = true
+is_enemy_grid = true
+
+[node name="PlayerGridDisplay" type="Node2D" parent="."]
+position = Vector2(660, 70)
+script = ExtResource("3_grid")
+interactive = false
+hide_ships = false
+is_enemy_grid = false
+
+[node name="HUD" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("4_hud")
+
+[node name="TopBar" type="ColorRect" parent="HUD"]
+anchor_right = 1.0
+size = Vector2(1280, 62)
+color = Color(0.06, 0.10, 0.18, 0.96)
+
+[node name="TurnLabel" type="Label" parent="HUD"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120.0
+offset_right = 120.0
+offset_top = 8.0
+offset_bottom = 36.0
+text = "YOUR TURN"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+
+[node name="FeedbackLabel" type="Label" parent="HUD"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -120.0
+offset_right = 120.0
+offset_top = 34.0
+offset_bottom = 62.0
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+
+[node name="SunkLabel" type="Label" parent="HUD"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -260.0
+offset_right = -10.0
+offset_top = 8.0
+offset_bottom = 58.0
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
+
+[node name="EnemyLabel" type="Label" parent="HUD"]
+offset_left = 20.0
+offset_right = 600.0
+offset_top = 658.0
+offset_bottom = 718.0
+text = "ENEMY WATERS  — click to fire"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+modulate = Color(0.65, 0.72, 0.85, 1)
+
+[node name="PlayerLabel" type="Label" parent="HUD"]
+offset_left = 660.0
+offset_right = 1240.0
+offset_top = 658.0
+offset_bottom = 718.0
+text = "YOUR FLEET"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+modulate = Color(0.65, 0.72, 0.85, 1)

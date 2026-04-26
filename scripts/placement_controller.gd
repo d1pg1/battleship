@@ -1,0 +1,158 @@
+class_name PlacementController
+extends Node
+
+const FLEET := [
+	{ "name": "Battleship",  "size": 4 },
+	{ "name": "Cruiser 1",   "size": 3 },
+	{ "name": "Cruiser 2",   "size": 3 },
+	{ "name": "Destroyer 1", "size": 2 },
+	{ "name": "Destroyer 2", "size": 2 },
+	{ "name": "Destroyer 3", "size": 2 },
+	{ "name": "Patrol 1",    "size": 1 },
+	{ "name": "Patrol 2",    "size": 1 },
+	{ "name": "Patrol 3",    "size": 1 },
+	{ "name": "Patrol 4",    "size": 1 },
+]
+
+@onready var _player_grid: GridDisplay = $"../PlayerGridDisplay"
+@onready var _ship_list: VBoxContainer = $"../Sidebar/VLayout/ShipList"
+@onready var _rotate_btn: Button       = $"../Sidebar/VLayout/RotateButton"
+@onready var _random_btn: Button       = $"../Sidebar/VLayout/RandomButton"
+@onready var _start_btn: Button        = $"../Sidebar/VLayout/StartButton"
+
+var _fleet_data: Array[ShipData] = []
+var _ship_buttons: Array[Button] = []
+var _selected: ShipData = null
+var _horizontal: bool = true
+
+func _ready() -> void:
+	GameManager.reset()
+	_player_grid.board_state = GameManager.player_board
+	_player_grid.interactive = true
+	_player_grid.hide_ships = false
+	_player_grid.is_enemy_grid = false
+
+	# Build fleet data and sidebar buttons
+	for def in FLEET:
+		var data := ShipData.new()
+		data.ship_name = def["name"]
+		data.size = def["size"]
+		_fleet_data.append(data)
+
+		var btn := Button.new()
+		btn.text = "%s (%d)" % [def["name"], def["size"]]
+		btn.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		# Capture data in closure
+		var captured := data
+		btn.pressed.connect(func(): _on_ship_button_pressed(captured))
+		_ship_list.add_child(btn)
+		_ship_buttons.append(btn)
+
+	_rotate_btn.pressed.connect(_on_rotate_pressed)
+	_random_btn.pressed.connect(_on_random_pressed)
+	_start_btn.pressed.connect(_on_start_pressed)
+	_player_grid.cell_tapped.connect(_on_grid_cell_tapped)
+
+	_update_start_button()
+
+func _on_ship_button_pressed(data: ShipData) -> void:
+	# If already placed, unplace it first
+	if data.is_placed:
+		GameManager.remove_ship(data)
+		_player_grid.refresh()
+		_update_button_style(data, false)
+
+	# Select this ship to place
+	_selected = data
+	_update_ghost()
+
+func _on_rotate_pressed() -> void:
+	_horizontal = not _horizontal
+	if _selected != null:
+		_selected.horizontal = _horizontal
+		_update_ghost()
+
+func _on_grid_cell_tapped(cell: Vector2i) -> void:
+	if _selected == null:
+		return
+	_selected.origin = cell
+	_selected.horizontal = _horizontal
+	if GameManager.place_ship(_selected):
+		_update_button_style(_selected, true)
+		_player_grid.set_ghost(null)
+		_player_grid.refresh()
+		_selected = null
+		_update_start_button()
+	else:
+		# Invalid placement — keep ghost visible (already shown in grid _draw)
+		pass
+
+func _on_random_pressed() -> void:
+	# Remove all currently placed ships and reset their state
+	for data in _fleet_data:
+		if data.is_placed:
+			GameManager.remove_ship(data)
+		data.hit_count = 0
+		data.is_placed = false
+
+	_selected = null
+	_player_grid.set_ghost(null)
+
+	# Place each existing ShipData object randomly (keeps UI references intact)
+	for data in _fleet_data:
+		var placed := false
+		var attempts := 0
+		while not placed and attempts < 10000:
+			attempts += 1
+			data.horizontal = (randi() % 2) == 0
+			var max_x := BoardState.GRID_SIZE - (data.size if data.horizontal else 1)
+			var max_y := BoardState.GRID_SIZE - (1 if data.horizontal else data.size)
+			data.origin = Vector2i(randi() % (max_x + 1), randi() % (max_y + 1))
+			if GameManager.place_ship(data):
+				placed = true
+		if not placed:
+			push_error("PlacementController: could not randomly place " + data.ship_name)
+
+	for data in _fleet_data:
+		_update_button_style(data, data.is_placed)
+
+	_player_grid.refresh()
+	_update_start_button()
+
+func _on_start_pressed() -> void:
+	_player_grid.set_ghost(null)
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/battle_screen.tscn")
+
+func _update_ghost() -> void:
+	if _selected == null:
+		_player_grid.set_ghost(null)
+		return
+	_selected.horizontal = _horizontal
+	_player_grid.set_ghost(_selected)
+
+func _update_button_style(data: ShipData, placed: bool) -> void:
+	var idx := _fleet_data.find(data)
+	if idx < 0:
+		return
+	var btn := _ship_buttons[idx]
+	btn.modulate.a = 0.45 if placed else 1.0
+
+func _update_start_button() -> void:
+	# Count ships actually placed on board
+	var placed_count := GameManager.player_board.ships.size()
+	_start_btn.disabled = (placed_count < FLEET.size())
+
+func _unhandled_key_input(event: InputEvent) -> void:
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.keycode == KEY_R:
+			_on_rotate_pressed()
+
+func _process(_delta: float) -> void:
+	# Update ghost origin to follow mouse hover on the grid
+	if _selected == null:
+		return
+	var hover := _player_grid._world_to_cell(get_viewport().get_mouse_position())
+	if hover != _selected.origin:
+		_selected.origin = hover
+		_player_grid.queue_redraw()

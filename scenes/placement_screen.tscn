@@ -1,0 +1,81 @@
+[gd_scene load_steps=3 format=3 uid="uid://placement_screen"]
+
+[ext_resource type="Script" path="res://scripts/placement_controller.gd" id="1_ctrl"]
+[ext_resource type="Script" path="res://scripts/grid_display.gd" id="2_grid"]
+
+[node name="PlacementScreen" type="Node2D"]
+
+[node name="Background" type="ColorRect" parent="."]
+position = Vector2(0, 0)
+size = Vector2(1280, 720)
+color = Color(0.05, 0.10, 0.20, 1.0)
+
+[node name="PlacementController" type="Node" parent="."]
+script = ExtResource("1_ctrl")
+
+[node name="PlayerGridDisplay" type="Node2D" parent="."]
+position = Vector2(40, 70)
+script = ExtResource("2_grid")
+interactive = true
+hide_ships = false
+is_enemy_grid = false
+
+[node name="Sidebar" type="Control" parent="."]
+position = Vector2(640, 0)
+size = Vector2(640, 720)
+
+[node name="SidebarBG" type="ColorRect" parent="Sidebar"]
+size = Vector2(640, 720)
+color = Color(0.07, 0.11, 0.20, 1.0)
+
+[node name="VLayout" type="VBoxContainer" parent="Sidebar"]
+position = Vector2(20, 20)
+size = Vector2(600, 680)
+
+[node name="TitleLabel" type="Label" parent="Sidebar/VLayout"]
+text = "PLACE YOUR FLEET"
+horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+
+[node name="Spacer0" type="Control" parent="Sidebar/VLayout"]
+custom_minimum_size = Vector2(0, 16)
+
+[node name="InstructLabel" type="Label" parent="Sidebar/VLayout"]
+text = "Select a ship, then click the grid to place it."
+horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 13
+modulate = Color(0.7, 0.75, 0.85, 1)
+autowrap_mode = 3
+
+[node name="Spacer1" type="Control" parent="Sidebar/VLayout"]
+custom_minimum_size = Vector2(0, 20)
+
+[node name="ShipList" type="VBoxContainer" parent="Sidebar/VLayout"]
+size_flags_horizontal = 3
+
+[node name="Spacer2" type="Control" parent="Sidebar/VLayout"]
+custom_minimum_size = Vector2(0, 24)
+
+[node name="RotateButton" type="Button" parent="Sidebar/VLayout"]
+text = "ROTATE  [R]"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+
+[node name="Spacer3" type="Control" parent="Sidebar/VLayout"]
+custom_minimum_size = Vector2(0, 10)
+
+[node name="RandomButton" type="Button" parent="Sidebar/VLayout"]
+text = "RANDOM PLACEMENT"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+
+[node name="Spacer4" type="Control" parent="Sidebar/VLayout"]
+custom_minimum_size = Vector2(0, 10)
+
+[node name="StartButton" type="Button" parent="Sidebar/VLayout"]
+text = "START BATTLE"
+size_flags_horizontal = 3
+disabled = true
+theme_override_font_sizes/font_size = 18

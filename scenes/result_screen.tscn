@@ -1,0 +1,46 @@
+[gd_scene load_steps=2 format=3 uid="uid://result_screen"]
+
+[ext_resource type="Script" path="res://scripts/result_screen.gd" id="1_rs"]
+
+[node name="ResultScreen" type="Control"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_rs")
+
+[node name="Background" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.06, 0.08, 0.15, 1.0)
+
+[node name="VBox" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -180.0
+offset_right = 180.0
+offset_top = -120.0
+offset_bottom = 120.0
+alignment = 1
+
+[node name="ResultLabel" type="Label" parent="VBox"]
+text = "VICTORY"
+horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 56
+
+[node name="Spacer" type="Control" parent="VBox"]
+custom_minimum_size = Vector2(0, 32)
+
+[node name="PlayAgainButton" type="Button" parent="VBox"]
+text = "PLAY AGAIN"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+
+[node name="Spacer2" type="Control" parent="VBox"]
+custom_minimum_size = Vector2(0, 12)
+
+[node name="MenuButton" type="Button" parent="VBox"]
+text = "MAIN MENU"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
