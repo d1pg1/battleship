@@ -1,0 +1,159 @@
+[gd_scene load_steps=6 format=3 uid="uid://battle_screen"]
+
+[ext_resource type="Script" path="res://scripts/battle_screen.gd" id="1_bs"]
+[ext_resource type="Script" path="res://scripts/ai_controller.gd" id="2_ai"]
+[ext_resource type="Script" path="res://scripts/grid_display.gd" id="3_grid"]
+[ext_resource type="Script" path="res://scripts/hud.gd" id="4_hud"]
+[ext_resource type="Texture2D" path="res://assets/main-menu-bg.png" id="5_bg"]
+
+[node name="BattleScreen" type="Node2D"]
+script = ExtResource("1_bs")
+
+[node name="AIController" type="Node" parent="."]
+script = ExtResource("2_ai")
+
+[node name="AIControllerP2" type="Node" parent="."]
+script = ExtResource("2_ai")
+
+[node name="Background" type="TextureRect" parent="."]
+position = Vector2(0, 0)
+size = Vector2(1280, 720)
+texture = ExtResource("5_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="EnemyGridDisplay" type="Node2D" parent="."]
+position = Vector2(20, 70)
+script = ExtResource("3_grid")
+interactive = true
+hide_ships = true
+is_enemy_grid = true
+
+[node name="PlayerGridDisplay" type="Node2D" parent="."]
+position = Vector2(660, 70)
+script = ExtResource("3_grid")
+interactive = false
+hide_ships = false
+is_enemy_grid = false
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="HUD" type="Control" parent="UILayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("4_hud")
+
+[node name="TopBar" type="ColorRect" parent="UILayer/HUD"]
+anchor_right = 1.0
+size = Vector2(1280, 62)
+color = Color(0.06, 0.10, 0.18, 0.96)
+
+[node name="MenuButton" type="Button" parent="UILayer/HUD"]
+offset_left = 8.0
+offset_right = 108.0
+offset_top = 10.0
+offset_bottom = 52.0
+text = "⬅ MENU"
+theme_override_font_sizes/font_size = 13
+
+[node name="TimerLabel" type="Label" parent="UILayer/HUD"]
+offset_left = 124.0
+offset_right = 260.0
+offset_top = 8.0
+offset_bottom = 58.0
+text = "00:00"
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.8, 0.9, 1, 1)
+
+[node name="TurnLabel" type="Label" parent="UILayer/HUD"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_right = 140.0
+offset_top = 8.0
+offset_bottom = 36.0
+text = "YOUR TURN"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 20
+
+[node name="FeedbackLabel" type="Label" parent="UILayer/HUD"]
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -140.0
+offset_right = 140.0
+offset_top = 34.0
+offset_bottom = 62.0
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 18
+
+[node name="SunkLabel" type="Label" parent="UILayer/HUD"]
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -260.0
+offset_right = -10.0
+offset_top = 8.0
+offset_bottom = 58.0
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 16
+
+[node name="EnemyLabel" type="Label" parent="UILayer/HUD"]
+offset_left = 20.0
+offset_right = 600.0
+offset_top = 658.0
+offset_bottom = 718.0
+text = "ENEMY WATERS  — click to fire"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+modulate = Color(0.65, 0.72, 0.85, 1)
+
+[node name="PlayerLabel" type="Label" parent="UILayer/HUD"]
+offset_left = 660.0
+offset_right = 1240.0
+offset_top = 658.0
+offset_bottom = 718.0
+text = "YOUR FLEET"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 13
+modulate = Color(0.65, 0.72, 0.85, 1)
+
+[node name="HandoffOverlay" type="Control" parent="UILayer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 0
+
+[node name="Scrim" type="ColorRect" parent="UILayer/HandoffOverlay"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.06, 0.11, 0.96)
+
+[node name="Panel" type="PanelContainer" parent="UILayer/HandoffOverlay"]
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -190.0
+offset_right = 190.0
+offset_top = -90.0
+offset_bottom = 90.0
+
+[node name="VBox" type="VBoxContainer" parent="UILayer/HandoffOverlay/Panel"]
+custom_minimum_size = Vector2(380, 180)
+alignment = 1
+
+[node name="HandoffLabel" type="Label" parent="UILayer/HandoffOverlay/Panel/VBox"]
+text = "PASS TO PLAYER 1"
+horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 28
+
+[node name="Spacer" type="Control" parent="UILayer/HandoffOverlay/Panel/VBox"]
+custom_minimum_size = Vector2(0, 22)
+
+[node name="ReadyButton" type="Button" parent="UILayer/HandoffOverlay/Panel/VBox"]
+text = "READY"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22

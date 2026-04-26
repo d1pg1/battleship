@@ -1,0 +1,307 @@
+[gd_scene load_steps=6 format=3 uid="uid://cqq3hlhlrtyxt"]
+
+[ext_resource type="Script" uid="uid://c4su78nj274kj" path="res://scripts/main_menu.gd" id="1_mm"]
+[ext_resource type="Texture2D" path="res://assets/main-menu-bg.png" id="2_bg"]
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_normal"]
+bg_color = Color(0.015, 0.045, 0.075, 0.92)
+border_width_left = 3
+border_width_top = 3
+border_width_right = 3
+border_width_bottom = 3
+border_color = Color(0.43, 0.5, 0.58, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+shadow_color = Color(0, 0, 0, 0.55)
+shadow_size = 3
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_hover"]
+bg_color = Color(0.02, 0.055, 0.085, 0.97)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(0.95, 0.69, 0.18, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+shadow_color = Color(0.95, 0.52, 0.08, 0.45)
+shadow_size = 5
+
+[sub_resource type="StyleBoxFlat" id="StyleBoxFlat_button_pressed"]
+bg_color = Color(0.78, 0.48, 0.08, 0.96)
+border_width_left = 4
+border_width_top = 4
+border_width_right = 4
+border_width_bottom = 4
+border_color = Color(1, 0.84, 0.26, 1)
+corner_radius_top_left = 2
+corner_radius_top_right = 2
+corner_radius_bottom_right = 2
+corner_radius_bottom_left = 2
+
+[node name="MainMenu" type="Control" unique_id=2003225488]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource("1_mm")
+
+[node name="Background" type="TextureRect" parent="." unique_id=1023391667]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+texture = ExtResource("2_bg")
+expand_mode = 1
+stretch_mode = 6
+
+[node name="VBox" type="VBoxContainer" parent="." unique_id=1466194947]
+layout_mode = 0
+anchor_left = 0.12
+anchor_top = 0.39
+anchor_right = 0.34
+anchor_bottom = 0.99
+theme_override_constants/separation = 8
+alignment = 0
+
+[node name="TitleLabel" type="Label" parent="VBox" unique_id=789725366]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
+theme_override_font_sizes/font_size = 48
+text = "NAVAL STRIKE"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="VBox" unique_id=1897889607]
+visible = false
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.55, 0.65, 0.8, 1)
+theme_override_font_sizes/font_size = 18
+text = "Battleship"
+horizontal_alignment = 1
+
+[node name="Spacer" type="Control" parent="VBox" unique_id=528645136]
+visible = false
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+
+[node name="VsAIButton" type="Button" parent="VBox" unique_id=1666001077]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.82, 0.87, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 0.78, 0.24, 1)
+theme_override_colors/font_pressed_color = Color(0.05, 0.04, 0.025, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
+text = "PLAYER VS AI"
+
+[node name="Spacer2" type="Control" parent="VBox" unique_id=895994732]
+visible = false
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+
+[node name="CampaignButton" type="Button" parent="VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 22
+text = "CAMPAIGN"
+
+[node name="SpacerCampaign" type="Control" parent="VBox"]
+visible = false
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+
+[node name="LocalPvpButton" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.82, 0.87, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 0.78, 0.24, 1)
+theme_override_colors/font_pressed_color = Color(0.05, 0.04, 0.025, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
+text = "LOCAL PVP"
+
+[node name="Spacer3" type="Control" parent="VBox"]
+visible = false
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+
+[node name="AIVsAIButton" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.82, 0.87, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 0.78, 0.24, 1)
+theme_override_colors/font_pressed_color = Color(0.05, 0.04, 0.025, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
+text = "AI VS AI"
+
+[node name="Spacer4" type="Control" parent="VBox"]
+visible = false
+custom_minimum_size = Vector2(0, 0)
+layout_mode = 2
+
+[node name="QuitButton" type="Button" parent="VBox"]
+custom_minimum_size = Vector2(0, 58)
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_colors/font_color = Color(0.82, 0.87, 0.9, 1)
+theme_override_colors/font_hover_color = Color(1, 0.78, 0.24, 1)
+theme_override_colors/font_pressed_color = Color(0.05, 0.04, 0.025, 1)
+theme_override_font_sizes/font_size = 28
+theme_override_styles/normal = SubResource("StyleBoxFlat_button_normal")
+theme_override_styles/hover = SubResource("StyleBoxFlat_button_hover")
+theme_override_styles/pressed = SubResource("StyleBoxFlat_button_pressed")
+theme_override_styles/focus = SubResource("StyleBoxFlat_button_hover")
+text = "QUIT"
+
+[node name="CampaignPrompt" type="Control" parent="."]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 0
+
+[node name="Scrim" type="ColorRect" parent="CampaignPrompt"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.06, 0.11, 0.92)
+
+[node name="Panel" type="PanelContainer" parent="CampaignPrompt"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_right = 220.0
+offset_top = -150.0
+offset_bottom = 150.0
+
+[node name="VBox" type="VBoxContainer" parent="CampaignPrompt/Panel"]
+custom_minimum_size = Vector2(440, 300)
+layout_mode = 2
+alignment = 1
+
+[node name="PromptTitle" type="Label" parent="CampaignPrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "CAMPAIGN IN PROGRESS"
+horizontal_alignment = 1
+
+[node name="PromptDetail" type="Label" parent="CampaignPrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+text = "Continue?"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="SpacerPrompt" type="Control" parent="CampaignPrompt/Panel/VBox"]
+custom_minimum_size = Vector2(0, 22)
+layout_mode = 2
+
+[node name="ContinueButton" type="Button" parent="CampaignPrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "CONTINUE"
+
+[node name="NewCampaignButton" type="Button" parent="CampaignPrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "START NEW"
+
+[node name="CancelButton" type="Button" parent="CampaignPrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "CANCEL"
+
+[node name="NamePrompt" type="Control" parent="."]
+visible = false
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 0
+
+[node name="Scrim" type="ColorRect" parent="NamePrompt"]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.06, 0.11, 0.92)
+
+[node name="Panel" type="PanelContainer" parent="NamePrompt"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_right = 220.0
+offset_top = -135.0
+offset_bottom = 135.0
+
+[node name="VBox" type="VBoxContainer" parent="NamePrompt/Panel"]
+custom_minimum_size = Vector2(440, 270)
+layout_mode = 2
+alignment = 1
+
+[node name="NameTitle" type="Label" parent="NamePrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+text = "COMMANDER NAME"
+horizontal_alignment = 1
+
+[node name="NameDetail" type="Label" parent="NamePrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 15
+theme_override_colors/font_color = Color(0.75, 0.84, 1, 1)
+text = "This name is used in campaign dialogue."
+horizontal_alignment = 1
+
+[node name="NameEdit" type="LineEdit" parent="NamePrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+max_length = 18
+placeholder_text = "Commander"
+text = "Commander"
+
+[node name="SpacerName" type="Control" parent="NamePrompt/Panel/VBox"]
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+
+[node name="StartButton" type="Button" parent="NamePrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 18
+text = "START CAMPAIGN"
+
+[node name="CancelButton" type="Button" parent="NamePrompt/Panel/VBox"]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 16
+text = "CANCEL"
