@@ -17,15 +17,25 @@ const FLEET := [
 @onready var _player_grid: GridDisplay = $"../PlayerGridDisplay"
 @onready var _ship_list: VBoxContainer = $"../Sidebar/VLayout/ShipList"
 @onready var _title_label: Label       = $"../Sidebar/VLayout/TitleLabel"
+@onready var _instruct_label: Label    = $"../Sidebar/VLayout/InstructLabel"
 @onready var _rotate_btn: Button       = $"../Sidebar/VLayout/RotateButton"
 @onready var _random_btn: Button       = $"../Sidebar/VLayout/RandomButton"
 @onready var _start_btn: Button        = $"../Sidebar/VLayout/StartButton"
+@onready var _dialogue_overlay: Control = $"../UILayer/DialogueOverlay"
+@onready var _portrait_rect: ColorRect = $"../UILayer/DialogueOverlay/Panel/VBox/DialogueRow/PortraitPanel/PortraitColor"
+@onready var _portrait_initials: Label = $"../UILayer/DialogueOverlay/Panel/VBox/DialogueRow/PortraitPanel/PortraitInitials"
+@onready var _dialogue_title: Label = $"../UILayer/DialogueOverlay/Panel/VBox/TitleLabel"
+@onready var _speaker_label: Label = $"../UILayer/DialogueOverlay/Panel/VBox/DialogueRow/TextBox/SpeakerLabel"
+@onready var _dialogue_label: Label = $"../UILayer/DialogueOverlay/Panel/VBox/DialogueRow/TextBox/DialogueLabel"
+@onready var _dialogue_btn: Button = $"../UILayer/DialogueOverlay/Panel/VBox/ContinueButton"
 
 var _fleet_data: Array[ShipData] = []
 var _ship_buttons: Array[Button] = []
 var _selected: ShipData = null
 var _horizontal: bool = true
 var _placing_player: int = 1
+var _campaign_dialogue: Array = []
+var _dialogue_index := 0
 
 func _ready() -> void:
 	GameManager.reset()
@@ -39,6 +49,10 @@ func _ready() -> void:
 	_random_btn.pressed.connect(_on_random_pressed)
 	_start_btn.pressed.connect(_on_start_pressed)
 	_player_grid.cell_tapped.connect(_on_grid_cell_tapped)
+	_dialogue_btn.pressed.connect(_on_dialogue_continue_pressed)
+
+	if GameManager.mode == GameManager.GameMode.CAMPAIGN:
+		_show_campaign_dialogue()
 
 func _begin_placement_for_player(player_number: int) -> void:
 	_placing_player = player_number
@@ -52,9 +66,17 @@ func _begin_placement_for_player(player_number: int) -> void:
 
 	if GameManager.mode == GameManager.GameMode.LOCAL_PVP:
 		_title_label.text = "PLAYER %d: PLACE FLEET" % _placing_player
+		_instruct_label.text = "Select a ship, then click the grid to place it."
+	elif GameManager.mode == GameManager.GameMode.CAMPAIGN:
+		_title_label.text = "%s: PLACE FLEET" % GameManager.campaign_title().to_upper()
+		if GameManager.campaign_is_tutorial():
+			_instruct_label.text = "Tutorial: choose a ship, rotate with R if needed, then place it on the grid. Ships cannot touch, even diagonally. Use RANDOM PLACEMENT if you want to start quickly."
+		else:
+			_instruct_label.text = "Place your fleet before facing %s." % GameManager.campaign_opponent_name()
 	else:
 		_title_label.text = "PLACE YOUR FLEET"
-	if _placing_player == 2 or GameManager.mode == GameManager.GameMode.VS_AI:
+		_instruct_label.text = "Select a ship, then click the grid to place it."
+	if _placing_player == 2 or GameManager.mode in [GameManager.GameMode.VS_AI, GameManager.GameMode.CAMPAIGN]:
 		_start_btn.text = "START BATTLE"
 	else:
 		_start_btn.text = "NEXT PLAYER"
@@ -150,6 +172,47 @@ func _on_start_pressed() -> void:
 		_begin_placement_for_player(2)
 		return
 	get_tree().call_deferred("change_scene_to_file", "res://scenes/battle_screen.tscn")
+
+func _show_campaign_dialogue() -> void:
+	_campaign_dialogue = GameManager.campaign_dialogue()
+	_dialogue_index = 0
+	_dialogue_title.text = "%s - %s" % [GameManager.campaign_title().to_upper(), GameManager.campaign_level()["theme"]]
+	_portrait_rect.color = GameManager.campaign_portrait_color()
+	_portrait_initials.text = _initials(GameManager.campaign_opponent_name())
+	_dialogue_overlay.visible = true
+	_player_grid.interactive = false
+	_player_grid.set_process(false)
+	_rotate_btn.disabled = true
+	_random_btn.disabled = true
+	_start_btn.disabled = true
+	_show_dialogue_line()
+
+func _show_dialogue_line() -> void:
+	if _dialogue_index >= _campaign_dialogue.size():
+		_dialogue_overlay.visible = false
+		_player_grid.interactive = true
+		_player_grid.set_process(true)
+		_rotate_btn.disabled = false
+		_random_btn.disabled = false
+		_update_start_button()
+		return
+	var line: Dictionary = _campaign_dialogue[_dialogue_index] as Dictionary
+	_speaker_label.text = line["speaker"]
+	_dialogue_label.text = line["text"]
+	_dialogue_btn.text = "PLACE FLEET" if _dialogue_index == _campaign_dialogue.size() - 1 else "CONTINUE"
+
+func _on_dialogue_continue_pressed() -> void:
+	_dialogue_index += 1
+	_show_dialogue_line()
+
+func _initials(text: String) -> String:
+	var words := text.split(" ", false)
+	var result := ""
+	for word in words:
+		result += word.substr(0, 1).to_upper()
+		if result.length() >= 2:
+			break
+	return result
 
 func _update_ghost() -> void:
 	if _selected == null:

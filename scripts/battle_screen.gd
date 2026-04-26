@@ -29,10 +29,15 @@ func _ready() -> void:
 	_enemy_grid.set_board_state(GameManager.ai_board)
 	_player_grid.set_board_state(GameManager.player_board)
 
-	if GameManager.mode == GameManager.GameMode.VS_AI:
+	if GameManager.mode in [GameManager.GameMode.VS_AI, GameManager.GameMode.CAMPAIGN]:
 		# Place AI ships randomly (invisible to player)
 		GameManager.ai_board.random_place_all(FLEET)
 		_enemy_grid.set_board_state(GameManager.ai_board)
+		if GameManager.mode == GameManager.GameMode.CAMPAIGN:
+			var level := GameManager.campaign_level()
+			_ai_controller.configure_profile(level["ai_profile"])
+			_enemy_label.text = "%s - %s" % [GameManager.campaign_opponent_name().to_upper(), level["theme"]]
+			_player_label.text = "YOUR FLEET"
 	elif GameManager.mode == GameManager.GameMode.AI_VS_AI:
 		GameManager.player_board.random_place_all(FLEET)
 		GameManager.ai_board.random_place_all(FLEET)
@@ -53,9 +58,14 @@ func _ready() -> void:
 	_menu_btn.pressed.connect(_on_menu_pressed)
 	_ready_btn.pressed.connect(_on_ready_pressed)
 
+	_start_current_battle()
+
+func _start_current_battle() -> void:
 	# Start the battle (PLAYER_TURN state + signal)
 	match GameManager.mode:
 		GameManager.GameMode.VS_AI:
+			GameManager.start_battle(_ai_controller)
+		GameManager.GameMode.CAMPAIGN:
 			GameManager.start_battle(_ai_controller)
 		GameManager.GameMode.AI_VS_AI:
 			GameManager.start_battle(_ai_controller, _ai_controller_p2)

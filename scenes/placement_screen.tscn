@@ -79,3 +79,83 @@ text = "START BATTLE"
 size_flags_horizontal = 3
 disabled = true
 theme_override_font_sizes/font_size = 18
+
+[node name="UILayer" type="CanvasLayer" parent="."]
+
+[node name="DialogueOverlay" type="Control" parent="UILayer"]
+visible = false
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 0
+
+[node name="Scrim" type="ColorRect" parent="UILayer/DialogueOverlay"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.03, 0.06, 0.11, 0.92)
+
+[node name="Panel" type="PanelContainer" parent="UILayer/DialogueOverlay"]
+anchor_left = 0.5
+anchor_right = 0.5
+anchor_top = 0.5
+anchor_bottom = 0.5
+offset_left = -430.0
+offset_right = 430.0
+offset_top = -170.0
+offset_bottom = 170.0
+
+[node name="VBox" type="VBoxContainer" parent="UILayer/DialogueOverlay/Panel"]
+custom_minimum_size = Vector2(860, 340)
+alignment = 1
+
+[node name="TitleLabel" type="Label" parent="UILayer/DialogueOverlay/Panel/VBox"]
+text = "LEVEL 1 - GRANDPARENTS"
+horizontal_alignment = 1
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.85, 0.92, 1, 1)
+
+[node name="SpacerA" type="Control" parent="UILayer/DialogueOverlay/Panel/VBox"]
+custom_minimum_size = Vector2(0, 22)
+
+[node name="DialogueRow" type="HBoxContainer" parent="UILayer/DialogueOverlay/Panel/VBox"]
+size_flags_horizontal = 3
+
+[node name="PortraitPanel" type="Control" parent="UILayer/DialogueOverlay/Panel/VBox/DialogueRow"]
+custom_minimum_size = Vector2(150, 170)
+
+[node name="PortraitColor" type="ColorRect" parent="UILayer/DialogueOverlay/Panel/VBox/DialogueRow/PortraitPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.72, 0.55, 0.38, 1)
+
+[node name="PortraitInitials" type="Label" parent="UILayer/DialogueOverlay/Panel/VBox/DialogueRow/PortraitPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+text = "G"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 46
+theme_override_colors/font_color = Color(0.05, 0.08, 0.15, 1)
+
+[node name="TextBox" type="VBoxContainer" parent="UILayer/DialogueOverlay/Panel/VBox/DialogueRow"]
+size_flags_horizontal = 3
+
+[node name="SpeakerLabel" type="Label" parent="UILayer/DialogueOverlay/Panel/VBox/DialogueRow/TextBox"]
+text = "Grandparents"
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(1, 0.86, 0.45, 1)
+
+[node name="DialogueLabel" type="Label" parent="UILayer/DialogueOverlay/Panel/VBox/DialogueRow/TextBox"]
+text = "Dialogue"
+autowrap_mode = 3
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20
+theme_override_colors/font_color = Color(0.9, 0.95, 1, 1)
+
+[node name="SpacerB" type="Control" parent="UILayer/DialogueOverlay/Panel/VBox"]
+custom_minimum_size = Vector2(0, 22)
+
+[node name="ContinueButton" type="Button" parent="UILayer/DialogueOverlay/Panel/VBox"]
+text = "CONTINUE"
+size_flags_horizontal = 3
+theme_override_font_sizes/font_size = 20

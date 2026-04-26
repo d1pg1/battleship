@@ -79,6 +79,28 @@ battle_screen.tscn
 result_screen.tscn
 ```
 
+Campaign mode adds a playable Kolobok progression on top of the normal VS AI loop:
+
+```
+main_menu.tscn
+    │  [CAMPAIGN]
+    ▼
+placement_screen.tscn
+    │  place fleet → [START BATTLE]
+    ▼
+battle_screen.tscn
+    │  fight current Kolobok opponent
+    ▼
+result_screen.tscn
+    │  [NEXT LEVEL] / [RETRY LEVEL]
+    ▼
+placement_screen.tscn
+```
+
+Phase 1 campaign levels use the standard 10×10 fleet and existing battle rules. Grandparents and Hare use simple random-fire AI profiles with different pacing; Wolf and later campaign opponents currently use the hunt/target AI until their special mechanics are added.
+
+Campaign placement now begins with a click-through dialogue overlay using placeholder character portraits, before the player can place ships. Level 1 also includes tutorial copy during placement and opening dialogue that explains placement spacing, firing, hits, misses, and turn changes.
+
 All scene transitions use `get_tree().call_deferred("change_scene_to_file", path)` to avoid mid-signal crashes.
 
 ---

@@ -30,9 +30,14 @@ func _ready() -> void:
 	GameManager.ship_sunk.connect(_on_ship_sunk)
 	GameManager.game_ended.connect(_on_game_ended)
 
-	_turn_label.text = "YOUR TURN"
+	if GameManager.mode == GameManager.GameMode.CAMPAIGN:
+		_turn_label.text = GameManager.campaign_title().to_upper()
+		_sunk_label.text = GameManager.campaign_intro()
+		_sunk_timer.wait_time = 5.0
+		_sunk_timer.start()
+	else:
+		_turn_label.text = "YOUR TURN"
 	_feedback_label.text = ""
-	_sunk_label.text = ""
 	_update_timer_label()
 
 func _process(delta: float) -> void:
@@ -44,6 +49,8 @@ func _on_turn_changed(new_state: GameManager.State) -> void:
 		GameManager.State.PLAYER_TURN:
 			if GameManager.mode == GameManager.GameMode.LOCAL_PVP:
 				_turn_label.text = GameManager.active_player_label() + " TURN"
+			elif GameManager.mode == GameManager.GameMode.CAMPAIGN:
+				_turn_label.text = "YOUR TURN - " + GameManager.campaign_opponent_name().to_upper()
 			else:
 				_turn_label.text = "YOUR TURN"
 		GameManager.State.AI_TURN:
@@ -68,6 +75,7 @@ func _on_shot_fired(_cell: Vector2i, result: Dictionary) -> void:
 
 func _on_ship_sunk(data: ShipData, _owner: String) -> void:
 	_sunk_label.text = "%s SUNK!" % data.ship_name.to_upper()
+	_sunk_timer.wait_time = 2.0
 	_sunk_timer.start()
 
 func _on_game_ended(_winner: String) -> void:

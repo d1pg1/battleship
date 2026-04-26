@@ -2,12 +2,24 @@ class_name AIController
 extends Node
 
 enum AIState { HUNT, TARGET }
+enum Profile { RANDOM, HARE, WOLF }
 
 var _mode: AIState = AIState.HUNT
+var _profile: Profile = Profile.WOLF
 var _fired: Array[Vector2i] = []
 var _hit_queue: Array[Vector2i] = []
 var _hit_run: Array[Vector2i] = []
 var _locked_axis: int = -1  # -1=none, 0=horizontal, 1=vertical
+
+func configure_profile(profile_name: String) -> void:
+	match profile_name:
+		"random":
+			_profile = Profile.RANDOM
+		"hare":
+			_profile = Profile.HARE
+		_:
+			_profile = Profile.WOLF
+	reset()
 
 func add_to_fired(cells: Array[Vector2i]) -> void:
 	for cell in cells:
@@ -23,14 +35,22 @@ func reset() -> void:
 
 func choose_cell() -> Vector2i:
 	var cell: Vector2i
-	if _mode == AIState.HUNT:
-		cell = _hunt()
-	else:
-		cell = _target()
+	match _profile:
+		Profile.RANDOM:
+			cell = _random_unfired()
+		Profile.HARE:
+			cell = _random_unfired()
+		_:
+			if _mode == AIState.HUNT:
+				cell = _hunt()
+			else:
+				cell = _target()
 	_fired.append(cell)
 	return cell
 
 func on_fire_result(cell: Vector2i, result: Dictionary) -> void:
+	if _profile != Profile.WOLF:
+		return
 	if result["result"] == BoardState.Cell.HIT:
 		_hit_run.append(cell)
 
@@ -67,6 +87,16 @@ func _hunt() -> Vector2i:
 				if not (cell in _fired):
 					candidates.append(cell)
 
+	candidates.shuffle()
+	return candidates[0]
+
+func _random_unfired() -> Vector2i:
+	var candidates: Array[Vector2i] = []
+	for row in range(10):
+		for col in range(10):
+			var cell := Vector2i(col, row)
+			if not (cell in _fired):
+				candidates.append(cell)
 	candidates.shuffle()
 	return candidates[0]
 
