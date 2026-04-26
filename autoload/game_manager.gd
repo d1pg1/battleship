@@ -26,8 +26,10 @@ const CAMPAIGN_LEVELS := [
 		"victory": "Careful now, commander. You have learned the waters first.",
 		"dialogue": [
 			{ "speaker": "Grandparents", "text": "Commander, thank the tides you came. Our little experimental vessel, Kolobok, has escaped the yard." },
+			{ "speaker": "{player}", "text": "Give me a fleet and a heading. I will bring Kolobok back." },
 			{ "speaker": "Grandparents", "text": "First, place your fleet. Ships can face sideways or forward, but they cannot touch, even by corners." },
 			{ "speaker": "Grandparents", "text": "In battle, choose a square on the enemy waters. A hit lets you fire again. A miss gives the enemy a turn." },
+			{ "speaker": "{player}", "text": "Understood. I will read the water one shot at a time." },
 			{ "speaker": "Grandparents", "text": "We will fire slowly and without tricks. Learn the grid, commander. Then follow Kolobok's wake." }
 		]
 	},
@@ -43,6 +45,7 @@ const CAMPAIGN_LEVELS := [
 		"victory": "Fast is not the same as accurate.",
 		"dialogue": [
 			{ "speaker": "Hare", "text": "Too slow! Too slow! Kolobok is already beyond your spyglass." },
+			{ "speaker": "{player}", "text": "Then I will make each shot count." },
 			{ "speaker": "Hare", "text": "You get ten seconds for each shot. I will pepper the waters until something cracks." }
 		]
 	},
@@ -57,6 +60,7 @@ const CAMPAIGN_LEVELS := [
 		"victory": "The hunter loses the trail.",
 		"dialogue": [
 			{ "speaker": "Wolf", "text": "Random waves are for frightened crews. I hunt patterns." },
+			{ "speaker": "{player}", "text": "Patterns can be broken." },
 			{ "speaker": "Wolf", "text": "Once I strike steel, I search around the wound until the whole ship goes under." }
 		]
 	},
@@ -72,6 +76,7 @@ const CAMPAIGN_LEVELS := [
 		"victory": "The sea is still again.",
 		"dialogue": [
 			{ "speaker": "Bear", "text": "Little shots. Little guesses. The sea trembles when I move." },
+			{ "speaker": "{player}", "text": "Then I will stay ahead of the tremor." },
 			{ "speaker": "Bear", "text": "Every few turns I strike a whole cross of water. Hide well, commander." }
 		]
 	},
@@ -87,6 +92,7 @@ const CAMPAIGN_LEVELS := [
 		"victory": "Kolobok slips away beyond the smoke.",
 		"dialogue": [
 			{ "speaker": "Kolobok", "text": "I sailed from the old hands. I sailed from the fast one. I sailed from the hunter." },
+			{ "speaker": "{player}", "text": "And now you sail into my grid." },
 			{ "speaker": "Kolobok", "text": "Strike me and I may shift what you have not yet found. Catch me if you can, commander." }
 		]
 	},
@@ -102,6 +108,7 @@ const CAMPAIGN_LEVELS := [
 		"victory": "The fox's whisper fades under the waves.",
 		"dialogue": [
 			{ "speaker": "Fox", "text": "You have become clever. That is dangerous. Clever captains trust what they think they see." },
+			{ "speaker": "{player}", "text": "Then I will trust the pattern, not the whisper." },
 			{ "speaker": "Fox", "text": "Some signals will lie. Come closer, commander. Just a little closer." }
 		]
 	},
@@ -117,6 +124,7 @@ const CAMPAIGN_LEVELS := [
 		"victory": "You have grown... enough to stop me.",
 		"dialogue": [
 			{ "speaker": "True Kolobok", "text": "You have learned from them. Speed. Hunger. Pressure. Doubt." },
+			{ "speaker": "{player}", "text": "I learned enough to end the chase." },
 			{ "speaker": "True Kolobok", "text": "I can shift, deceive, and strike wide. I am not running. I am choosing." }
 		]
 	},
@@ -129,6 +137,8 @@ var ai_board: BoardState
 var last_winner: String = ""
 var active_player: int = 1
 var campaign_level_index: int = 0
+var campaign_player_name: String = "Commander"
+var campaign_in_progress := false
 
 var _ai  # AIController — set by start_battle()
 var _ai_player_1
@@ -185,10 +195,23 @@ func start_new_game(new_mode: GameMode) -> void:
 	mode = new_mode
 	reset()
 
-func start_campaign() -> void:
+func start_campaign(player_name: String = "") -> void:
 	mode = GameMode.CAMPAIGN
 	campaign_level_index = 0
+	campaign_player_name = _clean_campaign_name(player_name)
+	campaign_in_progress = true
 	reset()
+
+func continue_campaign() -> void:
+	mode = GameMode.CAMPAIGN
+	campaign_in_progress = true
+	reset()
+
+func has_campaign_progress() -> bool:
+	return campaign_in_progress and campaign_level_index >= 0 and campaign_level_index < CAMPAIGN_LEVELS.size()
+
+func complete_campaign() -> void:
+	campaign_in_progress = false
 
 func campaign_level() -> Dictionary:
 	return CAMPAIGN_LEVELS[campaign_level_index]
@@ -211,6 +234,9 @@ func campaign_victory_text() -> String:
 
 func campaign_dialogue() -> Array:
 	return campaign_level()["dialogue"]
+
+func campaign_display_text(text: String) -> String:
+	return text.replace("{player}", campaign_player_name)
 
 func campaign_portrait_color() -> Color:
 	return campaign_level()["portrait_color"]
@@ -424,15 +450,15 @@ func _should_use_bear_area() -> bool:
 	return true
 
 func _run_campaign_area_attack() -> void:
-	var center := _ai.choose_cell()
-	var cells := _area_cells(center)
+	var center: Vector2i = _ai.choose_cell()
+	var cells: Array[Vector2i] = _area_cells(center)
 	var hit_any := false
 	campaign_event.emit("%s launches an area strike." % campaign_opponent_name())
 	_bear_area_cooldown = 3
 	for cell in cells:
 		if player_board.is_already_fired(cell):
 			continue
-		var result := player_board.fire(cell)
+		var result: Dictionary = player_board.fire(cell)
 		var fired_cells: Array[Vector2i] = [cell]
 		_ai.add_to_fired(fired_cells)
 		_ai.on_fire_result(cell, result)
@@ -487,4 +513,12 @@ func _end_game(winner: String) -> void:
 	_player_turn_timer.stop()
 	state = State.GAME_OVER
 	last_winner = winner
+	if mode == GameMode.CAMPAIGN and winner == "player" and campaign_is_final_level():
+		complete_campaign()
 	game_ended.emit(winner)
+
+func _clean_campaign_name(player_name: String) -> String:
+	var cleaned := player_name.strip_edges()
+	if cleaned.is_empty():
+		return campaign_player_name if not campaign_player_name.is_empty() else "Commander"
+	return cleaned.substr(0, 18)

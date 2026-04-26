@@ -43,7 +43,7 @@ func _setup(winner: String) -> void:
 func _on_play_again() -> void:
 	if GameManager.mode == GameManager.GameMode.CAMPAIGN:
 		if GameManager.last_winner == "player" and GameManager.campaign_is_final_level():
-			GameManager.start_campaign()
+			GameManager.start_campaign(GameManager.campaign_player_name)
 		else:
 			if GameManager.last_winner == "player":
 				GameManager.advance_campaign_level()
@@ -57,5 +57,8 @@ func _on_play_again() -> void:
 		get_tree().call_deferred("change_scene_to_file", "res://scenes/placement_screen.tscn")
 
 func _on_menu() -> void:
+	if GameManager.mode == GameManager.GameMode.CAMPAIGN:
+		if GameManager.last_winner == "player" and not GameManager.campaign_is_final_level():
+			GameManager.advance_campaign_level()
 	GameManager.reset()
 	get_tree().call_deferred("change_scene_to_file", "res://scenes/main_menu.tscn")

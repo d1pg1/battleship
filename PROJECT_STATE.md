@@ -101,6 +101,8 @@ Campaign levels use the standard 10×10 fleet and existing battle rules. Grandpa
 
 Campaign placement now begins with a click-through dialogue overlay using placeholder character portraits, before the player can place ships. Level 1 also includes tutorial copy during placement and opening dialogue that explains placement spacing, firing, hits, misses, and turn changes.
 
+Starting a campaign asks for a commander name, which is inserted into player dialogue lines. If the player returns to the main menu during a campaign, the current level is kept in memory for the current app session only; clicking Campaign again offers Continue or Start New. No campaign progress is written to disk.
+
 Campaign abilities are active:
 - Hare and True Kolobok can force a timed player turn; if the player waits too long, the turn passes.
 - Bear and True Kolobok can launch a cross-shaped area strike on cooldown.

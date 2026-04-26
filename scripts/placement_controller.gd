@@ -197,8 +197,8 @@ func _show_dialogue_line() -> void:
 		_update_start_button()
 		return
 	var line: Dictionary = _campaign_dialogue[_dialogue_index] as Dictionary
-	_speaker_label.text = line["speaker"]
-	_dialogue_label.text = line["text"]
+	_speaker_label.text = GameManager.campaign_display_text(line["speaker"])
+	_dialogue_label.text = GameManager.campaign_display_text(line["text"])
 	_dialogue_btn.text = "PLACE FLEET" if _dialogue_index == _campaign_dialogue.size() - 1 else "CONTINUE"
 
 func _on_dialogue_continue_pressed() -> void:
