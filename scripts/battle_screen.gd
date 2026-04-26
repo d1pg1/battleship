@@ -3,6 +3,7 @@ extends Node2D
 @onready var _ai_controller: AIController    = $AIController
 @onready var _enemy_grid: GridDisplay        = $EnemyGridDisplay
 @onready var _player_grid: GridDisplay       = $PlayerGridDisplay
+@onready var _menu_btn: Button               = $UILayer/HUD/MenuButton
 
 func _ready() -> void:
 	# Wire boards to grid displays
@@ -26,11 +27,16 @@ func _ready() -> void:
 	# Connect fire input
 	_enemy_grid.cell_tapped.connect(GameManager.player_fire)
 
-	# Connect game-over transition
+	# Connect game-over transition and menu button
 	GameManager.game_ended.connect(_on_game_ended)
+	_menu_btn.pressed.connect(_on_menu_pressed)
 
 	# Start the battle (PLAYER_TURN state + signal)
 	GameManager.start_battle(_ai_controller)
 
 func _on_game_ended(_winner: String) -> void:
 	get_tree().call_deferred("change_scene_to_file", "res://scenes/result_screen.tscn")
+
+func _on_menu_pressed() -> void:
+	GameManager.reset()
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/main_menu.tscn")
