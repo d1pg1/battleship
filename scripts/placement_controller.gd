@@ -197,8 +197,16 @@ func _show_dialogue_line() -> void:
 		_update_start_button()
 		return
 	var line: Dictionary = _campaign_dialogue[_dialogue_index] as Dictionary
-	_speaker_label.text = GameManager.campaign_display_text(line["speaker"])
+	var raw_speaker: String = line["speaker"]
+	var is_player_line: bool = raw_speaker == "{player}"
+	_speaker_label.text = GameManager.campaign_display_text(raw_speaker)
 	_dialogue_label.text = GameManager.campaign_display_text(line["text"])
+	if is_player_line:
+		_portrait_rect.color = GameManager.campaign_player_portrait_color()
+		_portrait_initials.text = _initials(GameManager.campaign_player_name)
+	else:
+		_portrait_rect.color = GameManager.campaign_portrait_color()
+		_portrait_initials.text = _initials(GameManager.campaign_opponent_name())
 	_dialogue_btn.text = "PLACE FLEET" if _dialogue_index == _campaign_dialogue.size() - 1 else "CONTINUE"
 
 func _on_dialogue_continue_pressed() -> void:

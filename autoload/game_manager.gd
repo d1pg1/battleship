@@ -241,6 +241,9 @@ func campaign_display_text(text: String) -> String:
 func campaign_portrait_color() -> Color:
 	return campaign_level()["portrait_color"]
 
+func campaign_player_portrait_color() -> Color:
+	return Color(0.30, 0.58, 0.86, 1.0)
+
 func campaign_is_tutorial() -> bool:
 	return campaign_level_index == 0
 
