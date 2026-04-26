@@ -41,25 +41,25 @@ The game must create **tension on every shot**. The single moment between firing
 ```
 [PLACEMENT PHASE]
   Player places 5 ships on own grid
-        ↓
+		↓
   GAME STARTS
-        ↓
+		↓
 [PLAYER TURN]
   Tap cell on enemy grid → fire
-        ↓
+		↓
 [REVEAL]
   HIT  → cell marks red, sunk feedback if applicable
   MISS → cell marks grey
-        ↓
+		↓
 [CHECK WIN] — All enemy ships sunk? → END SCREEN (Victory)
-        ↓
+		↓
 [AI TURN]
   AI fires on player grid → reveal
-        ↓
+		↓
 [CHECK LOSS] — All player ships sunk? → END SCREEN (Defeat)
-        ↓
+		↓
   ← loop back to PLAYER TURN ←
-        ↓
+		↓
 [END SCREEN]
   Win / Lose result + Play Again
 ```
@@ -174,14 +174,14 @@ The AI uses a two-state machine to feel tactical without requiring look-ahead:
 
 ```
 MAIN MENU
-    ↓ "Play"
+	↓ "Play"
 PLACEMENT SCREEN
-    ↓ "Start Battle"
+	↓ "Start Battle"
 BATTLE SCREEN
-    ↓ Win / Lose
+	↓ Win / Lose
 RESULT SCREEN
-    ↓ "Play Again" → PLACEMENT SCREEN
-    ↓ "Menu"       → MAIN MENU
+	↓ "Play Again" → PLACEMENT SCREEN
+	↓ "Menu"       → MAIN MENU
 ```
 
 ### Learning Curve
