@@ -131,6 +131,12 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 color = Color(0.72, 0.55, 0.38, 1)
 
+[node name="PortraitTexture" type="TextureRect" parent="UILayer/DialogueOverlay/Panel/VBox/DialogueRow/PortraitPanel"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+expand_mode = 1
+stretch_mode = 5
+
 [node name="PortraitInitials" type="Label" parent="UILayer/DialogueOverlay/Panel/VBox/DialogueRow/PortraitPanel"]
 anchor_right = 1.0
 anchor_bottom = 1.0

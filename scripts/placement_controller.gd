@@ -23,6 +23,7 @@ const FLEET := [
 @onready var _start_btn: Button        = $"../Sidebar/VLayout/StartButton"
 @onready var _dialogue_overlay: Control = $"../UILayer/DialogueOverlay"
 @onready var _portrait_rect: ColorRect = $"../UILayer/DialogueOverlay/Panel/VBox/DialogueRow/PortraitPanel/PortraitColor"
+@onready var _portrait_texture: TextureRect = $"../UILayer/DialogueOverlay/Panel/VBox/DialogueRow/PortraitPanel/PortraitTexture"
 @onready var _portrait_initials: Label = $"../UILayer/DialogueOverlay/Panel/VBox/DialogueRow/PortraitPanel/PortraitInitials"
 @onready var _dialogue_title: Label = $"../UILayer/DialogueOverlay/Panel/VBox/TitleLabel"
 @onready var _speaker_label: Label = $"../UILayer/DialogueOverlay/Panel/VBox/DialogueRow/TextBox/SpeakerLabel"
@@ -177,8 +178,7 @@ func _show_campaign_dialogue() -> void:
 	_campaign_dialogue = GameManager.campaign_dialogue()
 	_dialogue_index = 0
 	_dialogue_title.text = "%s - %s" % [GameManager.campaign_title().to_upper(), GameManager.campaign_level()["theme"]]
-	_portrait_rect.color = GameManager.campaign_portrait_color()
-	_portrait_initials.text = _initials(GameManager.campaign_opponent_name())
+	_show_opponent_portrait()
 	_dialogue_overlay.visible = true
 	_player_grid.interactive = false
 	_player_grid.set_process(false)
@@ -202,11 +202,9 @@ func _show_dialogue_line() -> void:
 	_speaker_label.text = GameManager.campaign_display_text(raw_speaker)
 	_dialogue_label.text = GameManager.campaign_display_text(line["text"])
 	if is_player_line:
-		_portrait_rect.color = GameManager.campaign_player_portrait_color()
-		_portrait_initials.text = _initials(GameManager.campaign_player_name)
+		_show_player_portrait()
 	else:
-		_portrait_rect.color = GameManager.campaign_portrait_color()
-		_portrait_initials.text = _initials(GameManager.campaign_opponent_name())
+		_show_opponent_portrait()
 	_dialogue_btn.text = "PLACE FLEET" if _dialogue_index == _campaign_dialogue.size() - 1 else "CONTINUE"
 
 func _on_dialogue_continue_pressed() -> void:
@@ -221,6 +219,21 @@ func _initials(text: String) -> String:
 		if result.length() >= 2:
 			break
 	return result
+
+func _show_opponent_portrait() -> void:
+	_portrait_rect.color = GameManager.campaign_portrait_color()
+	var texture: Texture2D = load(GameManager.campaign_portrait_path()) as Texture2D
+	_portrait_texture.texture = texture
+	_portrait_texture.visible = texture != null
+	_portrait_initials.visible = texture == null
+	_portrait_initials.text = _initials(GameManager.campaign_opponent_name())
+
+func _show_player_portrait() -> void:
+	_portrait_rect.color = GameManager.campaign_player_portrait_color()
+	_portrait_texture.texture = null
+	_portrait_texture.visible = false
+	_portrait_initials.visible = true
+	_portrait_initials.text = _initials(GameManager.campaign_player_name)
 
 func _update_ghost() -> void:
 	if _selected == null:

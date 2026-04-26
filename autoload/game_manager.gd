@@ -22,6 +22,7 @@ const CAMPAIGN_LEVELS := [
 		"theme": "Tutorial waters",
 		"ai_profile": "random",
 		"ai_delay": 1.0,
+		"portrait_path": "res://assets/Naval Battle Assets/Characters/Grandparents.png",
 		"portrait_color": Color(0.72, 0.55, 0.38, 1.0),
 		"intro": "We built him... but he slipped away.",
 		"victory": "Careful now, commander. You have learned the waters first.",
@@ -41,6 +42,7 @@ const CAMPAIGN_LEVELS := [
 		"ai_profile": "hare",
 		"ability": "hare_timer",
 		"ai_delay": 0.45,
+		"portrait_path": "res://assets/Naval Battle Assets/Characters/Hare.png",
 		"portrait_color": Color(0.62, 0.72, 0.88, 1.0),
 		"intro": "Too slow! Too slow! I will find him first!",
 		"victory": "Fast is not the same as accurate.",
@@ -56,6 +58,7 @@ const CAMPAIGN_LEVELS := [
 		"theme": "Hunting behavior",
 		"ai_profile": "wolf",
 		"ai_delay": 0.8,
+		"portrait_path": "res://assets/Naval Battle Assets/Characters/Wolf.png",
 		"portrait_color": Color(0.42, 0.48, 0.55, 1.0),
 		"intro": "Once I see blood... I do not stop.",
 		"victory": "The hunter loses the trail.",
@@ -72,6 +75,7 @@ const CAMPAIGN_LEVELS := [
 		"ai_profile": "wolf",
 		"ability": "bear_area",
 		"ai_delay": 0.95,
+		"portrait_path": "res://assets/Naval Battle Assets/Characters/Bear.png",
 		"portrait_color": Color(0.50, 0.36, 0.25, 1.0),
 		"intro": "No need to aim... I crush everything.",
 		"victory": "The sea is still again.",
@@ -88,6 +92,7 @@ const CAMPAIGN_LEVELS := [
 		"ai_profile": "wolf",
 		"ability": "relocate",
 		"ai_delay": 0.75,
+		"portrait_path": "res://assets/Naval Battle Assets/Characters/Kolobok.png",
 		"portrait_color": Color(0.86, 0.68, 0.28, 1.0),
 		"intro": "I sailed from them, I will sail from you!",
 		"victory": "Kolobok slips away beyond the smoke.",
@@ -104,6 +109,7 @@ const CAMPAIGN_LEVELS := [
 		"ai_profile": "wolf",
 		"ability": "decoy",
 		"ai_delay": 0.7,
+		"portrait_path": "res://assets/Naval Battle Assets/Characters/Fox.png",
 		"portrait_color": Color(0.86, 0.42, 0.22, 1.0),
 		"intro": "Come closer, commander... just a little closer.",
 		"victory": "The fox's whisper fades under the waves.",
@@ -120,6 +126,7 @@ const CAMPAIGN_LEVELS := [
 		"ai_profile": "wolf",
 		"ability": "true_mix",
 		"ai_delay": 0.65,
+		"portrait_path": "res://assets/Naval Battle Assets/Characters/True_Kolobok.png",
 		"portrait_color": Color(0.95, 0.82, 0.32, 1.0),
 		"intro": "You have learned from them... now learn from me.",
 		"victory": "You have grown... enough to stop me.",
@@ -242,6 +249,9 @@ func campaign_display_text(text: String) -> String:
 
 func campaign_portrait_color() -> Color:
 	return campaign_level()["portrait_color"]
+
+func campaign_portrait_path() -> String:
+	return campaign_level()["portrait_path"]
 
 func campaign_player_portrait_color() -> Color:
 	return Color(0.30, 0.58, 0.86, 1.0)
