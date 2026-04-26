@@ -97,9 +97,15 @@ result_screen.tscn
 placement_screen.tscn
 ```
 
-Phase 1 campaign levels use the standard 10×10 fleet and existing battle rules. Grandparents and Hare use simple random-fire AI profiles with different pacing; Wolf and later campaign opponents currently use the hunt/target AI until their special mechanics are added.
+Campaign levels use the standard 10×10 fleet and existing battle rules. Grandparents and Hare use simple random-fire AI profiles with different pacing; Wolf and later campaign opponents use hunt/target AI, with special abilities layered on top for Bear, Kolobok, Fox, and True Kolobok.
 
 Campaign placement now begins with a click-through dialogue overlay using placeholder character portraits, before the player can place ships. Level 1 also includes tutorial copy during placement and opening dialogue that explains placement spacing, firing, hits, misses, and turn changes.
+
+Campaign abilities are active:
+- Hare and True Kolobok can force a timed player turn; if the player waits too long, the turn passes.
+- Bear and True Kolobok can launch a cross-shaped area strike on cooldown.
+- Kolobok and True Kolobok can relocate one unhit hidden ship after the player lands a hit.
+- Fox and True Kolobok can spend limited false signals that make a miss feel suspicious in the HUD while the board still records the real miss.
 
 All scene transitions use `get_tree().call_deferred("change_scene_to_file", path)` to avoid mid-signal crashes.
 

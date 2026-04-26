@@ -34,7 +34,7 @@ func can_place(data: ShipData) -> bool:
 	for cell in ship_cells:
 		if not _in_bounds(cell):
 			return false
-		if _grid[cell.y][cell.x] == Cell.SHIP:
+		if _grid[cell.y][cell.x] != Cell.EMPTY:
 			return false
 		# No adjacent ships allowed, including diagonals
 		for dy in range(-1, 2):
@@ -65,6 +65,19 @@ func remove_ship(data: ShipData) -> void:
 	data.is_placed = false
 	data.hit_count = 0
 	ships.erase(data)
+
+func relocate_random_unhit_ship() -> bool:
+	var candidates: Array[ShipData] = []
+	for ship in ships:
+		if ship.hit_count == 0 and ship.is_placed:
+			candidates.append(ship)
+	if candidates.is_empty():
+		return false
+	candidates.shuffle()
+	for ship in candidates:
+		if _try_relocate_ship(ship):
+			return true
+	return false
 
 func fire(cell: Vector2i) -> Dictionary:
 	var result := { "result": Cell.MISS, "sunk_ship": null }
@@ -130,3 +143,32 @@ func random_place_all(fleet_defs: Array) -> void:
 
 		if not placed:
 			push_error("BoardState: could not place ship '%s' after 10000 attempts" % def["name"])
+
+func _try_relocate_ship(data: ShipData) -> bool:
+	var old_origin := data.origin
+	var old_horizontal := data.horizontal
+	var old_cells := data.cells()
+	for cell in old_cells:
+		_set_cell(cell, Cell.EMPTY)
+
+	var placed := false
+	var attempts := 0
+	while not placed and attempts < 10000:
+		attempts += 1
+		data.horizontal = (randi() % 2) == 0
+		var max_x := GRID_SIZE - (data.size if data.horizontal else 1)
+		var max_y := GRID_SIZE - (1 if data.horizontal else data.size)
+		data.origin = Vector2i(randi() % (max_x + 1), randi() % (max_y + 1))
+		if can_place(data):
+			for cell in data.cells():
+				_set_cell(cell, Cell.SHIP)
+			placed = true
+
+	if placed:
+		return true
+
+	data.origin = old_origin
+	data.horizontal = old_horizontal
+	for cell in old_cells:
+		_set_cell(cell, Cell.SHIP)
+	return false
