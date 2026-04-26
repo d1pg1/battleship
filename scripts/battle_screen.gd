@@ -1,6 +1,20 @@
 extends Node2D
 
+const FLEET := [
+	{ "name": "Battleship",  "size": 4 },
+	{ "name": "Cruiser 1",   "size": 3 },
+	{ "name": "Cruiser 2",   "size": 3 },
+	{ "name": "Destroyer 1", "size": 2 },
+	{ "name": "Destroyer 2", "size": 2 },
+	{ "name": "Destroyer 3", "size": 2 },
+	{ "name": "Patrol 1",    "size": 1 },
+	{ "name": "Patrol 2",    "size": 1 },
+	{ "name": "Patrol 3",    "size": 1 },
+	{ "name": "Patrol 4",    "size": 1 },
+]
+
 @onready var _ai_controller: AIController    = $AIController
+@onready var _ai_controller_p2: AIController = $AIControllerP2
 @onready var _enemy_grid: GridDisplay        = $EnemyGridDisplay
 @onready var _player_grid: GridDisplay       = $PlayerGridDisplay
 @onready var _menu_btn: Button               = $UILayer/HUD/MenuButton
@@ -17,19 +31,18 @@ func _ready() -> void:
 
 	if GameManager.mode == GameManager.GameMode.VS_AI:
 		# Place AI ships randomly (invisible to player)
-		GameManager.ai_board.random_place_all([
-			{ "name": "Battleship",  "size": 4 },
-			{ "name": "Cruiser 1",   "size": 3 },
-			{ "name": "Cruiser 2",   "size": 3 },
-			{ "name": "Destroyer 1", "size": 2 },
-			{ "name": "Destroyer 2", "size": 2 },
-			{ "name": "Destroyer 3", "size": 2 },
-			{ "name": "Patrol 1",    "size": 1 },
-			{ "name": "Patrol 2",    "size": 1 },
-			{ "name": "Patrol 3",    "size": 1 },
-			{ "name": "Patrol 4",    "size": 1 },
-		])
+		GameManager.ai_board.random_place_all(FLEET)
 		_enemy_grid.set_board_state(GameManager.ai_board)
+	elif GameManager.mode == GameManager.GameMode.AI_VS_AI:
+		GameManager.player_board.random_place_all(FLEET)
+		GameManager.ai_board.random_place_all(FLEET)
+		_enemy_grid.hide_ships = false
+		_enemy_grid.interactive = false
+		_enemy_grid.set_process(false)
+		_enemy_grid.set_board_state(GameManager.ai_board)
+		_player_grid.set_board_state(GameManager.player_board)
+		_enemy_label.text = "AI 2 FLEET"
+		_player_label.text = "AI 1 FLEET"
 
 	# Connect fire input
 	_enemy_grid.cell_tapped.connect(GameManager.fire_at_target)
@@ -41,12 +54,14 @@ func _ready() -> void:
 	_ready_btn.pressed.connect(_on_ready_pressed)
 
 	# Start the battle (PLAYER_TURN state + signal)
-	if GameManager.mode == GameManager.GameMode.VS_AI:
-		GameManager.start_battle(_ai_controller)
-	else:
-		GameManager.start_battle()
-	if GameManager.mode == GameManager.GameMode.LOCAL_PVP:
-		_show_handoff()
+	match GameManager.mode:
+		GameManager.GameMode.VS_AI:
+			GameManager.start_battle(_ai_controller)
+		GameManager.GameMode.AI_VS_AI:
+			GameManager.start_battle(_ai_controller, _ai_controller_p2)
+		_:
+			GameManager.start_battle()
+			_show_handoff()
 
 func _apply_pvp_perspective() -> void:
 	_enemy_grid.set_board_state(GameManager.current_target_board())

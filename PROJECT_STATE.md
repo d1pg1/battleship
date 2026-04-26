@@ -67,6 +67,18 @@ battle_screen.tscn
 result_screen.tscn
 ```
 
+AI vs AI skips placement and starts a watchable simulation:
+
+```
+main_menu.tscn
+    │  [AI VS AI]
+    ▼
+battle_screen.tscn
+    │  both fleets random-placed and visible
+    ▼
+result_screen.tscn
+```
+
 All scene transitions use `get_tree().call_deferred("change_scene_to_file", path)` to avoid mid-signal crashes.
 
 ---
@@ -151,11 +163,11 @@ Key methods:
 
 Owns the state machine and both board instances. All other scripts talk to game logic exclusively through this node and its signals — no direct cross-scene references.
 
-**Modes:** `VS_AI`, `LOCAL_PVP`
+**Modes:** `VS_AI`, `LOCAL_PVP`, `AI_VS_AI`
 
 **States:** `PLACEMENT → PLAYER_TURN → AI_TURN / RESULT_PAUSE / HANDOFF → GAME_OVER`
 
-In local PvP, `player_board` is Player 1's board and `ai_board` is Player 2's board.
+In local PvP, `player_board` is Player 1's board and `ai_board` is Player 2's board. In AI vs AI, those same boards are AI 1 and AI 2.
 
 Hits retain the current turn. `RESULT_PAUSE` and `HANDOFF` are used only in `LOCAL_PVP` after a miss changes control.
 
@@ -172,9 +184,10 @@ Hits retain the current turn. `RESULT_PAUSE` and `HANDOFF` are used only in `LOC
 `owner` is `"player"` when the player's ship is sunk, `"ai"` when the AI's ship is sunk.
 
 **Key behaviour:**
-- `player_fire(cell)` — guarded to `PLAYER_TURN` state; calls `reveal_surroundings` before emitting `ship_sunk`; starts the 0.8s Timer then transitions to `AI_TURN`.
+- `player_fire(cell)` — guarded to `PLAYER_TURN` state; calls `reveal_surroundings` before emitting `ship_sunk`; on miss starts the 0.8s Timer and transitions to `AI_TURN`.
 - `_on_ai_timer_timeout()` — calls `_ai.choose_cell()`, fires, calls `_ai.on_fire_result()` and `_ai.add_to_fired()` for auto-revealed cells, transitions back to `PLAYER_TURN`.
 - `reset()` — recreates both `BoardState` instances, clears `last_winner` and `_ai`. Called on Play Again and Menu navigation.
+- `_run_ai_vs_ai_turn()` — uses separate AIController instances for AI 1 and AI 2; hits keep the same active AI, misses swap control.
 
 ---
 
@@ -256,6 +269,7 @@ Thin coordinator for the battle scene. Responsibilities:
 - Injects `board_state` references into both `GridDisplay` nodes.
 - Calls `GameManager.ai_board.random_place_all(...)` to place AI ships invisibly in `VS_AI` mode.
 - In `LOCAL_PVP`, rebinds the two grids from the active player's perspective each turn.
+- In `AI_VS_AI`, random-places both boards, shows both fleets, and starts the simulation timer.
 - Connects `EnemyGridDisplay.cell_tapped → GameManager.fire_at_target`.
 - Shows the pass-and-play handoff overlay before each local PvP turn.
 - Connects `GameManager.game_ended → result_screen` scene transition.
@@ -265,11 +279,11 @@ Thin coordinator for the battle scene. Responsibilities:
 
 ### `scripts/result_screen.gd` — `class_name ResultScreen extends Control`
 
-Reads `GameManager.last_winner` in `_ready()`. Displays "VICTORY" / "DEFEAT" in `VS_AI`, or "PLAYER 1 WINS" / "PLAYER 2 WINS" in `LOCAL_PVP`. Play Again → reset + placement screen. Main Menu → reset + main menu.
+Reads `GameManager.last_winner` in `_ready()`. Displays "VICTORY" / "DEFEAT" in `VS_AI`, "PLAYER 1 WINS" / "PLAYER 2 WINS" in `LOCAL_PVP`, or "AI 1 WINS" / "AI 2 WINS" in `AI_VS_AI`. Play Again → reset + placement screen, except `AI_VS_AI` which restarts battle directly. Main Menu → reset + main menu.
 
 ### `scripts/main_menu.gd` — `class_name MainMenu extends Control`
 
-VS AI → sets `GameManager.mode = VS_AI` and opens placement. Local PvP → sets `GameManager.mode = LOCAL_PVP` and opens placement. Quit → `get_tree().quit()`.
+VS AI → sets `GameManager.mode = VS_AI` and opens placement. Local PvP → sets `GameManager.mode = LOCAL_PVP` and opens placement. AI vs AI → sets `GameManager.mode = AI_VS_AI` and opens battle directly. Quit → `get_tree().quit()`.
 
 ---
 
@@ -287,6 +301,8 @@ MainMenu (Control, script: main_menu.gd)
     ├── Spacer2
     ├── LocalPvpButton
     ├── Spacer3
+    ├── AIVsAIButton
+    ├── Spacer4
     └── QuitButton
 ```
 
@@ -314,6 +330,7 @@ Grid occupies x=40–620, y=70–650. Sidebar occupies x=640–1280.
 ```
 BattleScreen (Node2D, script: battle_screen.gd)
 ├── AIController (Node, script: ai_controller.gd)
+├── AIControllerP2 (Node, script: ai_controller.gd)
 ├── Background (ColorRect, 1280×720)
 ├── EnemyGridDisplay (Node2D @ 20,70, script: grid_display.gd)
 │     interactive=true  hide_ships=true  is_enemy_grid=true

@@ -11,6 +11,9 @@ script = ExtResource("1_bs")
 [node name="AIController" type="Node" parent="."]
 script = ExtResource("2_ai")
 
+[node name="AIControllerP2" type="Node" parent="."]
+script = ExtResource("2_ai")
+
 [node name="Background" type="ColorRect" parent="."]
 position = Vector2(0, 0)
 size = Vector2(1280, 720)

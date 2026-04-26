@@ -143,7 +143,7 @@ func _on_turn_changed(new_state: GameManager.State) -> void:
 	queue_redraw()
 
 func _on_ship_sunk(data: ShipData, _owner: String) -> void:
-	if is_enemy_grid and board_state != null and data in board_state.ships:
+	if is_enemy_grid and hide_ships and board_state != null and data in board_state.ships:
 		_revealed_ships.append(data)
 	queue_redraw()
 

@@ -64,6 +64,8 @@ The game must create **tension on every shot**. The single moment between firing
   Win / Lose result + Play Again
 ```
 
+Optional simulation mode skips placement, random-places both fleets, and runs AI vs AI on the battle screen with both boards visible.
+
 > **Loop integrity:** Every mechanic in this document maps back to one of three loop states: **Placement**, **Combat Turn**, or **End Resolution**. Any feature that doesn't serve these states is out of scope.
 
 ---
@@ -203,6 +205,7 @@ Naval Strike targets **zero onboarding text**. The player learns entirely throug
 | Player Win  | Screen flash white             | Victory fanfare | "VICTORY"         |
 | Player Lose | Screen flash red               | Defeat sting    | "DEFEAT"          |
 | AI Turn     | Enemy grid dims briefly        | —               | "ENEMY FIRING…"   |
+| AI vs AI Turn | Active AI label updates       | —               | "AI 1/2 FIRING…"  |
 
 ### AI Turn Pacing
 
@@ -332,7 +335,7 @@ All requirements below are pass/fail verifiable with no design interpretation ne
 | EN-01 | When all 5 enemy ships are sunk, the game ends and shows a win result screen.                                       |
 | EN-02 | When all 5 player ships are sunk, the game ends and shows a loss result screen.                                     |
 | EN-03 | No further shots can be fired after the game ends.                                                                  |
-| EN-04 | Tapping Play Again returns to the placement screen with fully reset game state (no ships placed, no shots recorded).|
+| EN-04 | Tapping Play Again resets game state; AI vs AI restarts battle directly, other modes return to placement.           |
 | EN-05 | The result screen clearly displays either "VICTORY" or "DEFEAT" in text.                                           |
 
 ### REQ-AI — AI Correctness
@@ -348,7 +351,7 @@ All requirements below are pass/fail verifiable with no design interpretation ne
 
 | ID    | Requirement                                                                                                         |
 |-------|---------------------------------------------------------------------------------------------------------------------|
-| UX-01 | A HUD element clearly shows whose turn it is (PLAYER TURN / ENEMY FIRING) at all times during combat.              |
+| UX-01 | A HUD element clearly shows whose turn it is (PLAYER TURN / ENEMY FIRING / AI N FIRING) during combat.             |
 | UX-02 | The player's own grid is not tappable as a target during combat.                                                    |
 | UX-03 | The enemy grid is not tappable during the AI turn.                                                                  |
 | UX-04 | A hit shot produces a visually distinct response from a miss shot within 0.3 seconds of the tap.                   |

@@ -11,6 +11,10 @@ func _ready() -> void:
 	_setup(GameManager.last_winner)
 
 func _setup(winner: String) -> void:
+	if GameManager.mode == GameManager.GameMode.AI_VS_AI:
+		_result_label.text = "AI 1 WINS" if winner == "player1" else "AI 2 WINS"
+		_result_label.modulate = Color(0.3, 1.0, 0.4)
+		return
 	if GameManager.mode == GameManager.GameMode.LOCAL_PVP:
 		_result_label.text = "PLAYER 1 WINS" if winner == "player1" else "PLAYER 2 WINS"
 		_result_label.modulate = Color(0.3, 1.0, 0.4)
@@ -24,7 +28,10 @@ func _setup(winner: String) -> void:
 
 func _on_play_again() -> void:
 	GameManager.reset()
-	get_tree().call_deferred("change_scene_to_file", "res://scenes/placement_screen.tscn")
+	if GameManager.mode == GameManager.GameMode.AI_VS_AI:
+		get_tree().call_deferred("change_scene_to_file", "res://scenes/battle_screen.tscn")
+	else:
+		get_tree().call_deferred("change_scene_to_file", "res://scenes/placement_screen.tscn")
 
 func _on_menu() -> void:
 	GameManager.reset()

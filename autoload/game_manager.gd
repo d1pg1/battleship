@@ -1,7 +1,7 @@
 extends Node
 
 enum State { PLACEMENT, PLAYER_TURN, AI_TURN, RESULT_PAUSE, HANDOFF, GAME_OVER }
-enum GameMode { VS_AI, LOCAL_PVP }
+enum GameMode { VS_AI, LOCAL_PVP, AI_VS_AI }
 
 signal turn_changed(new_state: State)
 signal shot_fired(cell: Vector2i, result: Dictionary)
@@ -20,6 +20,8 @@ var last_winner: String = ""
 var active_player: int = 1
 
 var _ai  # AIController — set by start_battle()
+var _ai_player_1
+var _ai_player_2
 var _timer: Timer
 var _pvp_handoff_timer: Timer
 var _pending_active_player: int = 1
@@ -50,6 +52,8 @@ func reset() -> void:
 	active_player = 1
 	_pending_active_player = 1
 	_ai = null
+	_ai_player_1 = null
+	_ai_player_2 = null
 
 func start_new_game(new_mode: GameMode) -> void:
 	mode = new_mode
@@ -72,11 +76,15 @@ func remove_ship(data: ShipData, player_number: int = 1) -> void:
 func can_place(data: ShipData, player_number: int = 1) -> bool:
 	return placement_board(player_number).can_place(data)
 
-func start_battle(ai_node = null) -> void:
+func start_battle(ai_node = null, ai_player_2_node = null) -> void:
 	_ai = ai_node
+	_ai_player_1 = ai_node
+	_ai_player_2 = ai_player_2_node
 	active_player = 1
-	state = State.PLAYER_TURN
+	state = State.AI_TURN if mode == GameMode.AI_VS_AI else State.PLAYER_TURN
 	turn_changed.emit(state)
+	if mode == GameMode.AI_VS_AI:
+		_timer.start()
 
 # ── Combat ───────────────────────────────────────────────────────────────────
 
@@ -87,6 +95,8 @@ func current_target_board() -> BoardState:
 	return ai_board if active_player == 1 else player_board
 
 func player_label(player_number: int) -> String:
+	if mode == GameMode.AI_VS_AI:
+		return "AI %d" % player_number
 	return "PLAYER %d" % player_number
 
 func active_player_label() -> String:
@@ -99,10 +109,11 @@ func active_winner_id() -> String:
 	return "player1" if active_player == 1 else "player2"
 
 func fire_at_target(cell: Vector2i) -> void:
-	if mode == GameMode.LOCAL_PVP:
-		pvp_fire(cell)
-	else:
-		player_fire(cell)
+	match mode:
+		GameMode.LOCAL_PVP:
+			pvp_fire(cell)
+		GameMode.VS_AI:
+			player_fire(cell)
 
 func player_fire(cell: Vector2i) -> void:
 	if state != State.PLAYER_TURN:
@@ -156,6 +167,9 @@ func _on_pvp_handoff_timer_timeout() -> void:
 	turn_changed.emit(state)
 
 func _on_ai_timer_timeout() -> void:
+	if mode == GameMode.AI_VS_AI:
+		_run_ai_vs_ai_turn()
+		return
 	var cell: Vector2i = _ai.choose_cell()
 	var result := player_board.fire(cell)
 	_ai.on_fire_result(cell, result)
@@ -172,6 +186,27 @@ func _on_ai_timer_timeout() -> void:
 		return
 	state = State.PLAYER_TURN
 	turn_changed.emit(state)
+
+func _run_ai_vs_ai_turn() -> void:
+	if state == State.GAME_OVER:
+		return
+	var controller = _ai_player_1 if active_player == 1 else _ai_player_2
+	var target_board := current_target_board()
+	var cell: Vector2i = controller.choose_cell()
+	var result := target_board.fire(cell)
+	controller.on_fire_result(cell, result)
+	shot_fired.emit(cell, result)
+	if result["sunk_ship"] != null:
+		var revealed := target_board.reveal_surroundings(result["sunk_ship"])
+		controller.add_to_fired(revealed)
+		ship_sunk.emit(result["sunk_ship"], target_owner_id())
+	if target_board.all_sunk():
+		_end_game(active_winner_id())
+		return
+	if result["result"] != BoardState.Cell.HIT:
+		active_player = 2 if active_player == 1 else 1
+	turn_changed.emit(state)
+	_timer.start()
 
 func _end_game(winner: String) -> void:
 	state = State.GAME_OVER
