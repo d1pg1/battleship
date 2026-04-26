@@ -8,6 +8,7 @@ extends Control
 @onready var _back_btn: Button = $VBox/BackButton
 
 func _ready() -> void:
+	ButtonStyle.apply_all($VBox, 26, 76)
 	_easy_btn.pressed.connect(func(): _start(GameManager.AIDifficulty.EASY))
 	_medium_btn.pressed.connect(func(): _start(GameManager.AIDifficulty.MEDIUM))
 	_hard_btn.pressed.connect(func(): _start(GameManager.AIDifficulty.HARD))

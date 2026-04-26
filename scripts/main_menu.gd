@@ -7,6 +7,7 @@ extends Control
 @onready var _quit_btn: Button = $VBox/QuitButton
 
 func _ready() -> void:
+	ButtonStyle.apply_all($VBox, 30, 84)
 	_vs_ai_btn.pressed.connect(_on_vs_ai)
 	_local_pvp_btn.pressed.connect(_on_local_pvp)
 	_ai_vs_ai_btn.pressed.connect(_on_ai_vs_ai)
