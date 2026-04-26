@@ -18,6 +18,7 @@ extends Control
 @onready var _name_cancel_btn: Button = $NamePrompt/Panel/VBox/CancelButton
 
 func _ready() -> void:
+	ButtonStyle.apply_all($VBox, 30, 84)
 	_vs_ai_btn.pressed.connect(_on_vs_ai)
 	_campaign_btn.pressed.connect(_on_campaign)
 	_local_pvp_btn.pressed.connect(_on_local_pvp)
